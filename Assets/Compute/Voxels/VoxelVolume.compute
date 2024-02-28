@@ -1,0 +1,53 @@
+#pragma kernel GenerateVoxelVolume
+#pragma kernel ApplyVoxelVolumeCSGOperations
+
+#include "Assets/Compute/Voxels/Include/GenerationGraph.hlsl"
+#include "Assets/Compute/Voxels/Include/VoxelVolume.hlsl"
+
+struct VoxelVolumeCSGOperation
+{
+    CSGOperator csgOperator;
+    CSGPrimitive csgPrimitive;
+    uint materialIndex;
+    float4x4 transformMatrix;
+};
+
+StructuredBuffer<VoxelVolumeCSGOperation> voxelVolumeCSGOperations;
+
+uint numberOfVoxelVolumeCSGOperations;
+
+[numthreads(4, 4, 4)]
+void GenerateVoxelVolume(uint3 voxelID : SV_DispatchThreadID)
+{
+    if (IsOutOfVoxelVolumeBounds(voxelID))
+    {
+        return;
+    }
+
+    float3 worldPosition = VoxelVolumeToWorldSpace(VoxelToVoxelVolumeSpace(voxelID));
+    Voxel voxel = EvaluateGenerationGraph(worldPosition);
+
+    SetVoxel(voxelID, voxel);
+}
+
+[numthreads(4, 4, 4)]
+void ApplyVoxelVolumeCSGOperations(uint3 voxelID : SV_DispatchThreadID)
+{
+    if (IsOutOfVoxelVolumeBounds(voxelID))
+    {
+        return;
+    }
+
+    float3 worldPosition = VoxelVolumeToWorldSpace(VoxelToVoxelVolumeSpace(voxelID));
+    Voxel voxel = GetVoxel(voxelID);
+
+    for (uint index = 0; index < numberOfVoxelVolumeCSGOperations; index++)
+    {
+        VoxelVolumeCSGOperation voxelVolumeCSGOperation = voxelVolumeCSGOperations[index];
+        float3 position = mul(voxelVolumeCSGOperation.transformMatrix, float4(worldPosition, 1.0f)).xyz;
+        float4 evaluatedPrimitive = EvaluateCSGPrimitive(position, voxelVolumeCSGOperation.csgPrimitive);
+        Voxel primitiveVoxel = Voxel::Create(evaluatedPrimitive, voxelVolumeCSGOperation.materialIndex);
+        voxel = ApplyCSGOperator(voxel, primitiveVoxel, voxelVolumeCSGOperation.csgOperator);
+    }
+    SetVoxel(voxelID, voxel);
+}

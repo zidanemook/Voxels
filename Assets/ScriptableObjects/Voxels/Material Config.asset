@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0344e777fc5763c469cbd0c39563c0b0, type: 3}
+  m_Name: Material Config
+  m_EditorClassIdentifier: 
+  m_renderMaterial: {fileID: 2100000, guid: 4c49ef764df32ef468e58bab85d32fcb, type: 2}
+  m_materialInfos:
+  - m_albedoTexture: {fileID: 2800000, guid: 234b3af2aa6a10f46b23f16bdd86b6ac, type: 3}
+    m_normalTexture: {fileID: 2800000, guid: 1868898f7e67ea64791d84563144ea9a, type: 3}
+    m_mohsTexture: {fileID: 2800000, guid: 82b1c8a2340f6394ba6f0736270e1d65, type: 3}
+  - m_albedoTexture: {fileID: 2800000, guid: 74785ce41fd84194cba6ce5e8dabc4d9, type: 3}
+    m_normalTexture: {fileID: 2800000, guid: 2aaf179f95a78f046b16cb0828da3ac7, type: 3}
+    m_mohsTexture: {fileID: 2800000, guid: 0b680ac74c79b3a4f86897e2e5196b8a, type: 3}
+  - m_albedoTexture: {fileID: 2800000, guid: 83f8f83ab396bbf4ba6d915315a1bb6e, type: 3}
+    m_normalTexture: {fileID: 2800000, guid: 9dd431c8fb0b1c5418d6e6e841c3a8be, type: 3}
+    m_mohsTexture: {fileID: 2800000, guid: 9ad48a053aca3474b85859944d32b6e7, type: 3}
+  - m_albedoTexture: {fileID: 2800000, guid: 7bc455ec248ae894e88bfeeecf989db1, type: 3}
+    m_normalTexture: {fileID: 2800000, guid: 1868898f7e67ea64791d84563144ea9a, type: 3}
+    m_mohsTexture: {fileID: 2800000, guid: 82b1c8a2340f6394ba6f0736270e1d65, type: 3}
