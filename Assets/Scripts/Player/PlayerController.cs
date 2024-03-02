@@ -1,9 +1,12 @@
+using Cysharp.Threading.Tasks;
+using TMPro;
 using Tuntenfisch.Voxels.CSG;
 using Tuntenfisch.Voxels.Materials;
 using Tuntenfisch.World;
 using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.UI;
 
 namespace Tuntenfisch.Player
 {
@@ -28,6 +31,9 @@ namespace Tuntenfisch.Player
         private float m_lookSensitivity = 0.05f;
         [SerializeField]
         private Camera m_camera;
+        
+        
+     
 
         private CharacterController m_controller;
         private int m_playerLayerMask;
@@ -39,12 +45,14 @@ namespace Tuntenfisch.Player
         private float3 m_velocity;
         private bool m_primaryDown;
         private bool m_secondaryDown;
+        
+        
 
         private void Start()
         {
             m_controller = GetComponent<CharacterController>();
             m_playerLayerMask = LayerMask.GetMask("Player");
-            Cursor.lockState = CursorLockMode.Locked;
+            
         }
 
         private void Update()
@@ -52,17 +60,51 @@ namespace Tuntenfisch.Player
             ApplyMovement();
             ApplyLook();
             HandleWorldInteraction();
+
+            
         }
 
-        public void OnMove(InputValue value) => m_moveDelta = value.Get<Vector2>();
+        public void OnMove(InputValue value)
+        {
+            if (UIManager.Instance.IsInUIMode) return;
+            m_moveDelta = value.Get<Vector2>();
+        } 
 
         public void OnJump() => m_wantsToJump = m_controller.isGrounded;
 
-        public void OnLook(InputValue value) => m_lookDelta = value.Get<Vector2>();
+        public void OnLook(InputValue value)
+        {
+            if (UIManager.Instance.IsInUIMode) return;
+            m_lookDelta = value.Get<Vector2>();
+        }
 
-        public void OnPrimary(InputValue value) => m_primaryDown = value.isPressed;
+        public void OnPrimary(InputValue value)
+        {
+            if (UIManager.Instance.IsInUIMode) return;
+            m_primaryDown = value.isPressed;
+        }
 
-        public void OnSecondary(InputValue value) => m_secondaryDown = value.isPressed;
+        public void OnSecondary(InputValue value)
+        {
+            if (UIManager.Instance.IsInUIMode) return;
+            m_secondaryDown = value.isPressed;
+        }
+
+        public void OnInGameMenu()
+        {
+            UIManager.Instance.OnInGameMenu();
+        }
+        
+        public void InGameMenuSaveButtonClicked()
+        {
+            WorldManager.Instance.ExportChunksInView().Forget();
+            UIManager.Instance.OnInGameMenu();
+        }
+        
+        public void OnExitButtonClicked()
+        {
+            Application.Quit();
+        }
 
         private void ApplyMovement()
         {

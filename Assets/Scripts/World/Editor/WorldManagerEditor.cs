@@ -1,6 +1,7 @@
 using Tuntenfisch.Editor;
 using Unity.Mathematics;
 using UnityEditor;
+using UnityEngine;
 
 namespace Tuntenfisch.World.Editor
 {
@@ -19,6 +20,8 @@ namespace Tuntenfisch.World.Editor
         private SerializedProperty m_chunkPrefab;
         private SerializedProperty m_initialChunkPoolPopulation;
         private SerializedProperty m_lodDistances;
+        private SerializedProperty m_saveProgressBar;
+        private SerializedProperty m_saveMessageText;
 
         private void OnEnable()
         {
@@ -27,6 +30,8 @@ namespace Tuntenfisch.World.Editor
             m_chunkPrefab = serializedObject.FindProperty(nameof(m_chunkPrefab));
             m_initialChunkPoolPopulation = serializedObject.FindProperty(nameof(m_initialChunkPoolPopulation));
             m_lodDistances = serializedObject.FindProperty(nameof(m_lodDistances));
+            m_saveProgressBar = serializedObject.FindProperty(nameof(m_saveProgressBar));
+            m_saveMessageText = serializedObject.FindProperty(nameof(m_saveMessageText));
         }
 
         public override void OnInspectorGUI()
@@ -78,6 +83,9 @@ namespace Tuntenfisch.World.Editor
                 EditorGUILayout.EndVertical();
             }
             EditorGUILayout.EndFoldoutHeaderGroup();
+            
+            EditorGUILayout.PropertyField(m_saveProgressBar, new GUIContent("Save Progress Bar"));
+            EditorGUILayout.PropertyField(m_saveMessageText, new GUIContent("Save Message Text"));
 
             serializedObject.ApplyModifiedProperties();
         }

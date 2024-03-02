@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
+using Cysharp.Threading.Tasks;
 using Tuntenfisch.Generics;
 using Tuntenfisch.Generics.Pool;
 using Tuntenfisch.Voxels.CSG;
@@ -19,6 +22,11 @@ namespace Tuntenfisch.World
     {
         private int m_currentLOD;
         private int m_targetLOD;
+
+        public int TargetLOD
+        {
+            set { m_targetLOD = value; }
+        }
         private int m_vertexCount;
         private int m_triangleCount;
 
@@ -41,7 +49,7 @@ namespace Tuntenfisch.World
             ApplyRenderMaterial();
             m_voxelVolumeCSGOperations = new List<GPUVoxelVolumeCSGOperation>();
         }
-
+        
         private void Update()
         {
             if (m_flags == 0)
@@ -55,6 +63,12 @@ namespace Tuntenfisch.World
                 WorldManager.VoxelVolume.GenerateVoxelVolume(m_voxelVolumeBuffer, transform.position);
             }
 
+            if ((m_flags & ChunkFlags.VoxelVolumeImportFromFileRequested) == ChunkFlags.VoxelVolumeImportFromFileRequested)
+            {
+                m_flags &= ~ChunkFlags.VoxelVolumeImportFromFileRequested;
+                ImportVolumeDataAsync(WorldManager.Instance.ChunkDirectoryPath);
+            }
+
             if ((m_flags & ChunkFlags.CSGOperationPerformed) == ChunkFlags.CSGOperationPerformed)
             {
                 m_flags &= ~ChunkFlags.CSGOperationPerformed;
@@ -62,7 +76,9 @@ namespace Tuntenfisch.World
                 m_voxelVolumeCSGOperations.Clear();
             }
 
-            if ((m_flags & ChunkFlags.MeshRegenerationRequested) == ChunkFlags.MeshRegenerationRequested && (m_flags & ChunkFlags.IsBakingMesh) != ChunkFlags.IsBakingMesh && m_request == null)
+            if ((m_flags & ChunkFlags.MeshRegenerationRequested) == ChunkFlags.MeshRegenerationRequested
+                && (m_flags & ChunkFlags.IsBakingMesh) != ChunkFlags.IsBakingMesh 
+                && m_request == null)
             {
                 m_flags &= ~ChunkFlags.MeshRegenerationRequested;
                 m_request = WorldManager.DualContouring.RequestMeshAsync
@@ -167,6 +183,7 @@ namespace Tuntenfisch.World
         }
 
         public void RegenerateVoxelVolume() => m_flags |= ChunkFlags.VoxelVolumeRegenerationRequested;
+        public void ImportVoxelVolumeFromFile() => m_flags |= ChunkFlags.VoxelVolumeImportFromFileRequested;
 
         public void RegenerateMesh(int lod = -1)
         {
@@ -241,7 +258,78 @@ namespace Tuntenfisch.World
             VoxelVolumeRegenerationRequested = 1,
             CSGOperationPerformed = 2,
             MeshRegenerationRequested = 4,
-            IsBakingMesh = 8
+            IsBakingMesh = 8,
+            VoxelVolumeImportFromFileRequested = 16
+        }
+        
+        public async UniTask ExportVolumeDataAsync(HashSet<int3> chunkFileList, string DirectoryPath)
+        {
+            int3 chunkCoordinate = WorldManager.Instance.CalculateChunkCoordinate(transform.position);
+            
+            string fileName = $"chunk_{chunkCoordinate.x}_{chunkCoordinate.y}_{chunkCoordinate.z}.dat";
+            System.IO.Directory.CreateDirectory(DirectoryPath);
+
+            string filePath = Path.Combine(DirectoryPath, fileName);
+            
+            var request = AsyncGPUReadback.Request(m_voxelVolumeBuffer);
+            await UniTask.WaitUntil(() => request.done);
+
+            if (request.hasError)
+            {
+                Debug.LogError("GPU readback error.");
+                return;
+            }
+
+            
+            uint[] bufferDataCopy = request.GetData<uint>().ToArray();
+            await UniTask.RunOnThreadPool(() =>
+            {
+                try
+                {
+                    using (var fs = new FileStream(filePath, FileMode.Create, FileAccess.Write))
+                    using (var writer = new BinaryWriter(fs))
+                    {
+                        foreach (uint item in bufferDataCopy)
+                        {
+                            writer.Write(item);
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError($"Failed to write file: {e}");
+                }
+            });
+
+            chunkFileList.Add(chunkCoordinate);
+
+        }
+
+        public async UniTask<bool> ImportVolumeDataAsync(string DirectoryPath)
+        {
+            int3 chunkCoordinate = WorldManager.Instance.CalculateChunkCoordinate(transform.position);
+            
+            string fileName = $"chunk_{chunkCoordinate.x}_{chunkCoordinate.y}_{chunkCoordinate.z}.dat";
+            string filePath = Path.Combine(DirectoryPath, fileName);
+            
+            if (!File.Exists(filePath))
+            {
+                Debug.LogWarning($"Chunk data file not found: {filePath}");
+                return false;
+            }
+            
+            byte[] fileData = await File.ReadAllBytesAsync(filePath);
+            
+            int numUint = fileData.Length / sizeof(uint);
+            uint[] volumeData = new uint[numUint];
+            Buffer.BlockCopy(fileData, 0, volumeData, 0, fileData.Length);
+            
+            m_voxelVolumeBuffer.SetData(volumeData);
+    
+            RegenerateMesh(m_targetLOD);
+            return true;
         }
     }
+    
+   
 }

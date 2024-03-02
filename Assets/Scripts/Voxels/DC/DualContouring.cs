@@ -122,7 +122,8 @@ namespace Tuntenfisch.Voxels.DC
             // Only call the callback if the task hasn't been canceled.
             if (!task.Canceled)
             {
-                task.Callback(worker.Vertices, worker.VertexCount, 0, worker.Triangles, worker.TriangleCount, 2);
+                //Chunk.cs private void OnMeshGenerated
+                task.Callback(worker.GeneratedVertices, worker.VertexCount, 0, worker.Triangles, worker.TriangleCount, 2);
             }
             m_taskPool.Release(task);
 
@@ -140,7 +141,7 @@ namespace Tuntenfisch.Voxels.DC
         {
             public int VertexCount { get; private set; }
             public int TriangleCount { get; private set; }
-            public NativeArray<GPUVertex> Vertices => m_generatedVertices;
+            public NativeArray<GPUVertex> GeneratedVertices => m_generatedVertices;
             // In addition to the triangles, this native array also reads back the number of triangles and the number of vertices generated, i.e.
             // two additional integers.
             public NativeArray<int> Triangles => m_generatedTriangles;

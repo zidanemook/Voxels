@@ -1,5 +1,10 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.IO;
+using System.Text.RegularExpressions;
+using Cysharp.Threading.Tasks;
+using TMPro;
 using Tuntenfisch.Generics;
 using Tuntenfisch.Generics.Pool;
 using Tuntenfisch.Voxels;
@@ -10,6 +15,7 @@ using Tuntenfisch.Voxels.Volume;
 using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Assertions;
+using UnityEngine.UI;
 
 namespace Tuntenfisch.World
 {
@@ -20,7 +26,6 @@ namespace Tuntenfisch.World
         public static VoxelConfig VoxelConfig => Instance.m_voxelConfig;
         public static VoxelVolume VoxelVolume => Instance.m_voxelVolume;
         public static DualContouring DualContouring => Instance.m_dualContouring;
-
         private float ViewDistanceSquared => m_lodDistancesSquared[m_lodDistancesSquared.Length - 1];
 
         [SerializeField]
@@ -33,6 +38,19 @@ namespace Tuntenfisch.World
         private int m_initialChunkPoolPopulation = 0;
         [SerializeField]
         private float[] m_lodDistances;
+        
+        // Saving
+        [SerializeField]
+        private  Slider m_saveProgressBar;
+        [SerializeField]
+        private  TextMeshProUGUI m_saveMessageText;
+
+        private bool m_isSaving;
+
+        public bool IsSaving
+        {
+            get { return m_isSaving; }
+        }
 
         private VoxelConfig m_voxelConfig;
         private VoxelVolume m_voxelVolume;
@@ -45,13 +63,25 @@ namespace Tuntenfisch.World
         private HashSet<int3> m_processedChunkCoordinates;
         private float3 m_chunkDimensions;
 
+        //safety for digging
         private float m_underlimit = 0f;
+        
+        private HashSet<int3> m_chunkFileList;
+        private string m_chunkDirectoryPath;
+        public string ChunkDirectoryPath
+        {
+            get { return m_chunkDirectoryPath; }
+            private set { m_chunkDirectoryPath = value; } // 필요한 경우 값을 설정할 수 있도록 합니다.
+        }
 
         // We don't want to update the world every frame.
         private float3 m_lastViewerPosition;
         private float m_updateIntervalSquared;
         private float[] m_lodDistancesSquared;
 
+        
+        
+        
         private void Start()
         {
             Assert.IsFalse(m_chunkPrefab.activeSelf);
@@ -67,6 +97,7 @@ namespace Tuntenfisch.World
 
             m_chunkPool = new ObjectPool<Chunk>(() => { return Instantiate(m_chunkPrefab, transform).GetComponent<Chunk>(); }, m_initialChunkPoolPopulation);
             m_chunks = new Dictionary<int3, Chunk>();
+            m_chunkFileList = new HashSet<int3>();
             m_chunksOutsideOfViewDistance = new List<int3>();
             m_chunksToProcess = new Queue<(int3, float3, int)>();
             m_processedChunkCoordinates = new HashSet<int3>();
@@ -77,7 +108,13 @@ namespace Tuntenfisch.World
             m_updateIntervalSquared = math.pow(m_updateInterval, 2.0f);
             m_lodDistancesSquared = CalculateLodDistancesSquared();
 
+            m_chunkDirectoryPath = Path.Combine(System.Environment.GetFolderPath(System.Environment.SpecialFolder.MyDocuments), "My Games", "Voxel", "Chunk");
+            
+            //청크파일 저장된 목록
+            LoadChunkFileList();
+            
             UpdateWorld(m_viewer.position);
+            
         }
 
         private void Update()
@@ -156,16 +193,14 @@ namespace Tuntenfisch.World
 
         private void UpdateWorld(float3 viewerPosition)
         {
-            DestroyChunksOutsideViewDistance(viewerPosition);
+            DestroyChunksOutsideViewDistanceAsync(viewerPosition);
             
-            //이미 저장했던 지역이라면 로딩
-            
-            //아니라면 새로운 청크 생성
             CreateChunksWithinViewDistance(viewerPosition);
         }
 
-        private void DestroyChunksOutsideViewDistance(float3 viewerPosition)
+        private async UniTask DestroyChunksOutsideViewDistanceAsync(float3 viewerPosition)
         {
+           List<UniTask> tasks = new List<UniTask>();
             
             foreach (KeyValuePair<int3, Chunk> pair in m_chunks)
             {
@@ -174,23 +209,25 @@ namespace Tuntenfisch.World
                 if (viewerToChunkDistanceSquared > ViewDistanceSquared)
                 {
                     m_chunksOutsideOfViewDistance.Add(pair.Key);
+                   var task = pair.Value.ExportVolumeDataAsync(m_chunkFileList, m_chunkDirectoryPath);
+                   tasks.Add(task);
                 }
             }
+            
+            await UniTask.WhenAll(tasks);
 
             foreach (int3 chunkCoordinate in m_chunksOutsideOfViewDistance)
             {
-                //청크단위로 하드디스크에 저장해야함
-                
                 m_chunkPool.Release(m_chunks[chunkCoordinate]);
                 m_chunks.Remove(chunkCoordinate);
             }
             m_chunksOutsideOfViewDistance.Clear();
         }
-
-        //처음 생성되야할 지형에만 사용. 첫시작. 첫탐험지역
+        
         private void CreateChunksWithinViewDistance(float3 viewerPosition)
         {
             int3 chunkCoordinate = CalculateChunkCoordinate(viewerPosition);
+            
             float3 chunkPosition = chunkCoordinate * m_chunkDimensions;
             float viewerToChunkDistanceSquared = math.lengthsq(chunkPosition - viewerPosition);
             int lod = CalculateChunkLod(viewerToChunkDistanceSquared);
@@ -210,12 +247,26 @@ namespace Tuntenfisch.World
                 }
                 else
                 {
-                    // Create new chunk.
-                    chunk = m_chunkPool.Acquire();
-                    chunk.transform.position = chunkPosition;
-                    chunk.RegenerateVoxelVolume();
-                    chunk.RegenerateMesh(lod);
-                    m_chunks[chunkCoordinate] = chunk;
+
+                    //m_chunkFileList 에 있으면 로딩 없으면 생성
+                    if (m_chunkFileList.Contains(chunkCoordinate))
+                    {
+                        chunk = m_chunkPool.Acquire();
+                        chunk.transform.position = chunkPosition;
+                        chunk.ImportVoxelVolumeFromFile();
+                        chunk.TargetLOD = lod;
+                        //ImportVoxelVolumeFromFile 에서 chunk.RegenerateMesh(lod); 호출함
+                        m_chunks[chunkCoordinate] = chunk;
+                    }
+                    else
+                    {
+                        // Create new chunk.
+                        chunk = m_chunkPool.Acquire();
+                        chunk.transform.position = chunkPosition;
+                        chunk.RegenerateVoxelVolume();
+                        chunk.RegenerateMesh(lod);
+                        m_chunks[chunkCoordinate] = chunk;
+                    }
                 }
 
                 EnqueueChunk(chunkCoordinate + new int3(1, 0, 0), viewerPosition);
@@ -224,7 +275,7 @@ namespace Tuntenfisch.World
                 EnqueueChunk(chunkCoordinate - new int3(0, 0, 1), viewerPosition);
             }
         }
-
+        
         private void EnqueueChunk(int3 neighbourChunkCoordinate, float3 viewerPosition)
         {
             if (!m_processedChunkCoordinates.Contains(neighbourChunkCoordinate))
@@ -249,7 +300,7 @@ namespace Tuntenfisch.World
             return VoxelConfig.VoxelVolumeConfig.VoxelVolumeDimensions / inflationFactor;
         }
 
-        private int3 CalculateChunkCoordinate(float3 position) => new int3((int)math.round(position.x / m_chunkDimensions.x), 0, (int)math.round(position.z / m_chunkDimensions.z));
+        public int3 CalculateChunkCoordinate(float3 position) => new int3((int)math.round(position.x / m_chunkDimensions.x), 0, (int)math.round(position.z / m_chunkDimensions.z));
 
         private float[] CalculateLodDistancesSquared()
         {
@@ -317,6 +368,85 @@ namespace Tuntenfisch.World
                 chunk.RegenerateVoxelVolume();
                 chunk.RegenerateMesh();
             }
+        }
+
+        private void LoadChunkFileList()
+        {
+            if (Directory.Exists(m_chunkDirectoryPath))
+            {
+                // "chunk_"로 시작하는 모든 .dat 파일을 가져옴
+                string[] files = Directory.GetFiles(m_chunkDirectoryPath, "chunk_*.dat");
+                foreach (string file in files)
+                {
+                    // 파일 이름에서 좌표를 추출
+                    int3 chunkCoordinate = ExtractCoordinatesFromFileName(Path.GetFileNameWithoutExtension(file));
+                    m_chunkFileList.Add(chunkCoordinate);
+                }
+            }
+            else
+            {
+                Debug.LogWarning($"Directory does not exist: {m_chunkDirectoryPath}");
+            }
+        }
+        
+        private int3 ExtractCoordinatesFromFileName(string fileName)
+        {
+            // 파일 이름에서 숫자를 추출하기 위한 정규식
+            Regex regex = new Regex(@"chunk_(-?\d+)_(-?\d+)_(-?\d+)");
+            Match match = regex.Match(fileName);
+            if (match.Success)
+            {
+                int x = int.Parse(match.Groups[1].Value);
+                int y = int.Parse(match.Groups[2].Value);
+                int z = int.Parse(match.Groups[3].Value);
+                return new int3(x, y, z);
+            }
+            else
+            {
+                Debug.LogError($"Invalid file name format: {fileName}");
+                return int3.zero; // 유효하지 않은 경우, 기본값 반환
+            }
+        }
+
+        public async UniTask ExportChunksInView()
+        {
+            
+            var chunksSnapshot = new Dictionary<int3, Chunk>(m_chunks);
+            int totalChunks = chunksSnapshot.Count;
+            int chunksProcessed = 0;
+
+            m_isSaving = true;
+            m_saveProgressBar.gameObject.SetActive(true);
+                
+            foreach (var chunkPair in chunksSnapshot)
+            {
+                Chunk chunk = chunkPair.Value;
+                await chunk.ExportVolumeDataAsync(m_chunkFileList, m_chunkDirectoryPath);
+
+                chunksProcessed++;
+                UpdateSaveProgress(chunksProcessed, totalChunks);
+            }
+
+            m_saveProgressBar.gameObject.SetActive(false);
+            m_isSaving = false;
+            
+            StartCoroutine(ShowSaveMessageCoroutine(3));
+        }
+
+        private void UpdateSaveProgress(int chunksProcessed, int totalChunks)
+        {
+            if (m_saveProgressBar != null)
+            {
+                float progress = (float)chunksProcessed / totalChunks;
+                m_saveProgressBar.value = progress * 100; // 0에서 100 사이의 값으로 변환
+            }
+        }
+        
+        IEnumerator ShowSaveMessageCoroutine(float displayTime)
+        {
+            m_saveMessageText.gameObject.SetActive(true);
+            yield return new WaitForSeconds(displayTime);
+            m_saveMessageText.gameObject.SetActive(false);
         }
     }
 }

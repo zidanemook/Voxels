@@ -11,7 +11,8 @@
                     "id": "af98e75c-6838-408c-9f5a-fc71e783f049",
                     "expectedControlType": "Vector2",
                     "processors": "",
-                    "interactions": ""
+                    "interactions": "",
+                    "initialStateCheck": false
                 },
                 {
                     "name": "Jump",
@@ -19,7 +20,8 @@
                     "id": "3e70a003-8382-4ed9-8480-d02c3ff7bed6",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": ""
+                    "interactions": "",
+                    "initialStateCheck": false
                 },
                 {
                     "name": "Look",
@@ -27,7 +29,8 @@
                     "id": "dc65307a-5748-47c9-9f27-3b8bd0b40bd4",
                     "expectedControlType": "Vector2",
                     "processors": "",
-                    "interactions": ""
+                    "interactions": "",
+                    "initialStateCheck": false
                 },
                 {
                     "name": "Primary",
@@ -35,7 +38,8 @@
                     "id": "e5248aa1-bf62-4b39-971f-cd136602fa3c",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": "Press(behavior=2)"
+                    "interactions": "Press(behavior=2)",
+                    "initialStateCheck": false
                 },
                 {
                     "name": "Secondary",
@@ -43,7 +47,17 @@
                     "id": "23f8d66f-013a-4b54-92fa-d761817c3909",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": "Press(behavior=2)"
+                    "interactions": "Press(behavior=2)",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "InGameMenu",
+                    "type": "Button",
+                    "id": "0d75b3be-b1ed-4c35-a0d8-0b9ac184e6df",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -198,6 +212,17 @@
                     "processors": "",
                     "groups": "Keyboard and Mouse",
                     "action": "Secondary",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "InGameMenu",
+                    "id": "61d27fb9-448f-43b0-84ca-fcb941a8dc73",
+                    "path": "<Keyboard>/escape",
+                    "interactions": "Press",
+                    "processors": "",
+                    "groups": "Keyboard and Mouse",
+                    "action": "InGameMenu",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
