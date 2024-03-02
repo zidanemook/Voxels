@@ -2,7 +2,7 @@
 using Tuntenfisch.Generics;
 using UnityEngine;
 
-namespace Tuntenfisch.World
+namespace Tuntenfisch.Game
 {
     public class GameManager : SingletonComponent<GameManager>
     {

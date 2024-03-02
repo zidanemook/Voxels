@@ -2,12 +2,15 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MainMenuController : MonoBehaviour
+namespace Tuntenfisch.UI
 {
- 
-
-    public void OnExitButtonClicked()
+    public class MainMenuController : MonoBehaviour
     {
-        Application.Quit();
+
+
+        public void OnExitButtonClicked()
+        {
+            Application.Quit();
+        }
     }
 }

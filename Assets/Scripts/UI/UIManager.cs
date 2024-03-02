@@ -1,9 +1,10 @@
 ﻿using TMPro;
 using Tuntenfisch.Generics;
 using UnityEngine;
+using Tuntenfisch.World;
 using UnityEngine.Serialization;
 
-namespace Tuntenfisch.World
+namespace Tuntenfisch.UI
 {
    
     public class UIManager : SingletonComponent<UIManager>
