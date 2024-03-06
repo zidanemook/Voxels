@@ -151,6 +151,7 @@ namespace Tuntenfisch.Voxels.DC
             private NativeArray<GPUVertex> m_generatedVertices;
             private NativeArray<int> m_generatedTriangles;
 
+            // "counter" 타입의 컴퓨트 버퍼로 삼각형 버퍼를 선언할 수 없기 때문에, 생성된 삼각형의 수를 추적하기 위해 이 버퍼를 사용합니다.
             private AsyncComputeBuffer m_cellVertexInfoLookupTableBuffer;
             private AsyncComputeBuffer m_generatedVerticesBuffer0;
             private AsyncComputeBuffer m_generatedVerticesBuffer1;
@@ -215,9 +216,10 @@ namespace Tuntenfisch.Voxels.DC
                 m_parent.m_voxelConfig.DualContouringConfig.Compute.SetBuffer(0, ComputeShaderProperties.GeneratedVertices0, m_generatedVerticesBuffer0);
                 m_parent.m_voxelConfig.DualContouringConfig.Compute.Dispatch(0, m_parent.m_voxelConfig.VoxelVolumeConfig.NumberOfCells - 2);
 
-                // Next we generate the desired level of detail for the previously generated vertices of this chunk.
-                // The safest way to go about level of detail is to first generate the mesh vertices at the highest lod (above dispatch call) and then merge those vertices
-                // to create a lower lod. In order to leverage the GPU's parallelism we do this iteratively, similarly to how parallel reduction works.
+                // 이 청크의 이전에 생성된 꼭짓점들에 대해 원하는 LOD를 생성합니다.
+                // LOD를 처리하는 가장 안전한 방법은 먼저 최고 LOD에서 메쉬 꼭짓점을 생성한 다음,
+                // 그 꼭짓점들을 병합하여 낮은 LOD를 생성하는 것입니다.
+                // GPU의 병렬성을 활용하기 위해, 우리는 이를 반복적으로 수행합니다, 이는 병렬 축소 작업이 작동하는 방식과 유사합니다.
                 m_parent.m_voxelConfig.DualContouringConfig.Compute.SetBuffer(1, ComputeShaderProperties.CellVertexInfoLookupTable, m_cellVertexInfoLookupTableBuffer);
 
                 for (int cellStride = 2; cellStride <= (1 << task.TargetLOD); cellStride <<= 1)
@@ -306,7 +308,11 @@ namespace Tuntenfisch.Voxels.DC
                     m_generatedVertices = new NativeArray<GPUVertex>(generatedVerticesCapacity, Allocator.Persistent);
                 }
 
-                int maxNumberOfTriangles = 3 * 6 * (int)math.round(math.pow(m_parent.m_voxelConfig.VoxelVolumeConfig.NumberOfCellsAlongAxis - 1, 3));
+                int maxNumberOfTriangles = 3 * 6 * (m_parent.m_voxelConfig.VoxelVolumeConfig.NumberOfCellsAlongX - 1) 
+                                           * (m_parent.m_voxelConfig.VoxelVolumeConfig.NumberOfCellsAlongY - 1) 
+                                           * (m_parent.m_voxelConfig.VoxelVolumeConfig.NumberOfCellsAlongZ - 1);
+                //int maxNumberOfTriangles = 3 * 6 * (int)math.round(math.pow(m_parent.m_voxelConfig.VoxelVolumeConfig.NumberOfCellsAlongAxis - 1, 3));
+                
                 // As mentioned, in addition to storing the triangles, this buffer will also store the number of vertices and triangles generated, i.e.
                 // two additional integers.
                 int generatedTrianglesCapacity = maxNumberOfTriangles + 2;

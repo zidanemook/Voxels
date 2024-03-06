@@ -1,3 +1,4 @@
+using System;
 using Cysharp.Threading.Tasks;
 using TMPro;
 using Tuntenfisch.Voxels.CSG;
@@ -45,7 +46,11 @@ namespace Tuntenfisch.Player
         private float2 m_rotation;
         private float3 m_velocity;
         private bool m_primaryDown;
+        private bool m_primaryDownPreState = false;
+        private bool m_primaryRelease = false;
         private bool m_secondaryDown;
+        private bool m_secondaryDownPreState;
+        private bool m_secondaryRelease;
         
         
 
@@ -62,7 +67,7 @@ namespace Tuntenfisch.Player
             ApplyLook();
             HandleWorldInteraction();
 
-            
+            ButtonReleaseOnce();
         }
 
         public void OnMove(InputValue value)
@@ -91,6 +96,32 @@ namespace Tuntenfisch.Player
             m_secondaryDown = value.isPressed;
         }
 
+        public void ButtonReleaseOnce()
+        {
+            
+            if (m_primaryDown == false && m_primaryDownPreState == true)
+            {
+                //Debug.Log("OnPrimaryReleaseOnce Called!");
+                m_primaryRelease = true;
+            }
+            else
+            {
+                m_primaryRelease = false;
+            }
+            m_primaryDownPreState = m_primaryDown;
+
+            if (m_secondaryDown == false && m_secondaryDownPreState == true)
+            {
+                m_secondaryRelease = true;
+            }
+            else
+            {
+                m_secondaryRelease = false;
+            }
+
+            m_secondaryDownPreState = m_secondaryDown;
+        }
+        
         public void OnInGameMenu()
         {
             UIManager.Instance.OnInGameMenu();
@@ -98,8 +129,8 @@ namespace Tuntenfisch.Player
         
         public void InGameMenuSaveButtonClicked()
         {
-            WorldManager.Instance.ExportChunksInView().Forget();
-            UIManager.Instance.OnInGameMenu();
+            //WorldManager.Instance.ExportChunksInView().Forget();
+            //UIManager.Instance.OnInGameMenu();
         }
         
         public void OnExitButtonClicked()
@@ -111,12 +142,12 @@ namespace Tuntenfisch.Player
         {
             if (m_controller.isGrounded)
             {
-                m_velocity.y = m_wantsToJump ? math.sqrt(-2.0f * Gravity * m_jumpHeight) : c_minDownwardVelocity;
+                //m_velocity.y = m_wantsToJump ? math.sqrt(-2.0f * Gravity * m_jumpHeight) : c_minDownwardVelocity;
                 m_wantsToJump = false;
             }
             else
             {
-                m_velocity.y += Gravity * Time.deltaTime;
+                //m_velocity.y += Gravity * Time.deltaTime;
             }
 
             m_velocity.xz = (((float3)transform.right).xz * m_moveDelta.x + ((float3)transform.forward).xz * m_moveDelta.y) * m_movementSpeed;
@@ -155,6 +186,13 @@ namespace Tuntenfisch.Player
                 {
                     WorldManager.Instance.ApplyCSGOperation(new GPUCSGOperator(CSGOperatorIndex.Difference), primitive, default, hit.point, scale);
                 }
+            }
+
+
+            if (m_primaryRelease || m_secondaryRelease)
+            {
+                //Debug.Log("OnPrimaryReleaseOnce Called!");
+                WorldManager.Instance.ExportChunksAfterCSGOperation();
             }
         }
     }

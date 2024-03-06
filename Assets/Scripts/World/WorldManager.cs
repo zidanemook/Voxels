@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
+using System.Threading;
 using Cysharp.Threading.Tasks;
 using TMPro;
 using Tuntenfisch.Generics;
@@ -44,9 +45,8 @@ namespace Tuntenfisch.World
         private  Slider m_saveProgressBar;
         [SerializeField]
         private  TextMeshProUGUI m_saveMessageText;
-
+        
         private bool m_isSaving;
-
         public bool IsSaving
         {
             get { return m_isSaving; }
@@ -67,6 +67,7 @@ namespace Tuntenfisch.World
         private float m_underlimit = 0f;
         
         private HashSet<int3> m_chunkFileList;
+        private HashSet<int3> m_chunkToExport;
         private string m_chunkDirectoryPath;
         public string ChunkDirectoryPath
         {
@@ -74,11 +75,16 @@ namespace Tuntenfisch.World
             private set { m_chunkDirectoryPath = value; } // 필요한 경우 값을 설정할 수 있도록 합니다.
         }
 
+        private bool isExporting = false;
+
         // We don't want to update the world every frame.
         private float3 m_lastViewerPosition;
         private float m_updateIntervalSquared;
         private float[] m_lodDistancesSquared;
 
+
+        private string m_worldName;
+        
         
         
         
@@ -98,6 +104,7 @@ namespace Tuntenfisch.World
             m_chunkPool = new ObjectPool<Chunk>(() => { return Instantiate(m_chunkPrefab, transform).GetComponent<Chunk>(); }, m_initialChunkPoolPopulation);
             m_chunks = new Dictionary<int3, Chunk>();
             m_chunkFileList = new HashSet<int3>();
+            m_chunkToExport = new HashSet<int3>();
             m_chunksOutsideOfViewDistance = new List<int3>();
             m_chunksToProcess = new Queue<(int3, float3, int)>();
             m_processedChunkCoordinates = new HashSet<int3>();
@@ -148,28 +155,86 @@ namespace Tuntenfisch.World
                 if (m_underlimit > (position.y - scale.y))
                     return;
             }
-            
-            const float scaleInflationFactor = 1.5f;
-
-            Matrix4x4 worldToObjectMatrix = Matrix4x4.TRS(position, quaternion.identity, scale).inverse;
-
-            // Inflate the scale a bit to ensure CSG operations near the boundary of chunks are processed by all nearby chunks.
-            int3 minChunkCoordinate = CalculateChunkCoordinate(position - 0.5f * scaleInflationFactor * scale);
-            int3 maxChunkCoordinate = CalculateChunkCoordinate(position + 0.5f * scaleInflationFactor * scale);
-
-            for (int3 chunkCoordinate = minChunkCoordinate; chunkCoordinate.z <= maxChunkCoordinate.z; chunkCoordinate.z++)
+            if (isExporting)
             {
-                for (chunkCoordinate.y = minChunkCoordinate.y; chunkCoordinate.y <= maxChunkCoordinate.y; chunkCoordinate.y++)
+                Debug.Log("Export in progress. Operation skipped.");
+                return;
+            }
+
+
+            try
+            {
+               
+                
+                
+                const float scaleInflationFactor = 1.5f;
+
+                Matrix4x4 worldToObjectMatrix = Matrix4x4.TRS(position, quaternion.identity, scale).inverse;
+
+                // Inflate the scale a bit to ensure CSG operations near the boundary of chunks are processed by all nearby chunks.
+                int3 minChunkCoordinate = CalculateChunkCoordinate(position - 0.5f * scaleInflationFactor * scale);
+                int3 maxChunkCoordinate = CalculateChunkCoordinate(position + 0.5f * scaleInflationFactor * scale);
+
+                for (int3 chunkCoordinate = minChunkCoordinate;
+                     chunkCoordinate.z <= maxChunkCoordinate.z;
+                     chunkCoordinate.z++)
                 {
-                    for (chunkCoordinate.x = minChunkCoordinate.x; chunkCoordinate.x <= maxChunkCoordinate.x; chunkCoordinate.x++)
+                    for (chunkCoordinate.y = minChunkCoordinate.y;
+                         chunkCoordinate.y <= maxChunkCoordinate.y;
+                         chunkCoordinate.y++)
                     {
-                        if (m_chunks.TryGetValue(chunkCoordinate, out Chunk chunk))
+                        for (chunkCoordinate.x = minChunkCoordinate.x;
+                             chunkCoordinate.x <= maxChunkCoordinate.x;
+                             chunkCoordinate.x++)
                         {
-                            chunk.ApplyCSGPrimitiveOperation(csgOperator, csgPrimitive, materialIndex, worldToObjectMatrix);
+                            if (m_chunks.TryGetValue(chunkCoordinate, out Chunk chunk))
+                            {
+                                chunk.ApplyCSGPrimitiveOperation(csgOperator, csgPrimitive, materialIndex,
+                                    worldToObjectMatrix);
+                                m_chunkToExport.Add(chunkCoordinate);
+
+                            }
                         }
                     }
                 }
             }
+            finally
+            {
+
+            }
+
+        }
+        
+        public async UniTask ExportChunksAfterCSGOperation()
+        {
+            if (isExporting)
+            {
+                Debug.Log("Export already in progress.");
+                return;
+            }
+    
+            try
+            {
+                isExporting = true;
+                
+                foreach (int3 chunkCoordinate in m_chunkToExport)
+                {
+                    if (m_chunks.TryGetValue(chunkCoordinate, out Chunk chunk))
+                    {
+                        await chunk.ExportVolumeDataAsync(m_chunkFileList, m_chunkDirectoryPath);
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"An error occurred while exporting chunks: {e.Message}");
+            }
+            finally
+            {
+                m_chunkToExport.Clear();
+                isExporting = false;
+            }
+
         }
 
         public bool GetMaterialFromRaycastHit(RaycastHit hit, out MaterialIndex materialIndex)
@@ -196,12 +261,12 @@ namespace Tuntenfisch.World
             DestroyChunksOutsideViewDistanceAsync(viewerPosition);
             
             CreateChunksWithinViewDistance(viewerPosition);
+            
+            //Debug.Log($"Chunk Count : {m_chunks.Count}");
         }
 
         private async UniTask DestroyChunksOutsideViewDistanceAsync(float3 viewerPosition)
         {
-           List<UniTask> tasks = new List<UniTask>();
-            
             foreach (KeyValuePair<int3, Chunk> pair in m_chunks)
             {
                 float viewerToChunkDistanceSquared = math.lengthsq((float3)pair.Value.transform.position - viewerPosition);
@@ -209,12 +274,9 @@ namespace Tuntenfisch.World
                 if (viewerToChunkDistanceSquared > ViewDistanceSquared)
                 {
                     m_chunksOutsideOfViewDistance.Add(pair.Key);
-                   var task = pair.Value.ExportVolumeDataAsync(m_chunkFileList, m_chunkDirectoryPath);
-                   tasks.Add(task);
+
                 }
             }
-            
-            await UniTask.WhenAll(tasks);
 
             foreach (int3 chunkCoordinate in m_chunksOutsideOfViewDistance)
             {
@@ -231,6 +293,7 @@ namespace Tuntenfisch.World
             float3 chunkPosition = chunkCoordinate * m_chunkDimensions;
             float viewerToChunkDistanceSquared = math.lengthsq(chunkPosition - viewerPosition);
             int lod = CalculateChunkLod(viewerToChunkDistanceSquared);
+            lod = 2; //testcode
 
             m_processedChunkCoordinates.Clear();
             m_chunksToProcess.Clear();
@@ -254,8 +317,10 @@ namespace Tuntenfisch.World
                         chunk = m_chunkPool.Acquire();
                         chunk.transform.position = chunkPosition;
                         chunk.ImportVoxelVolumeFromFile();
-                        chunk.TargetLOD = lod;
-                        //ImportVoxelVolumeFromFile 에서 chunk.RegenerateMesh(lod); 호출함
+                        //chunk.RegenerateMesh(lod);
+                        if(lod != 0)
+                            chunk.TargetLOD = lod;
+                        //ImportVolumeDataAsync 에서 chunk.RegenerateMesh(lod); 호출함
                         m_chunks[chunkCoordinate] = chunk;
                     }
                     else
@@ -295,9 +360,15 @@ namespace Tuntenfisch.World
         {
             const int voxelOverlap = 1;
 
-            float inflationFactor = 1.0f + (float)voxelOverlap / (VoxelConfig.VoxelVolumeConfig.NumberOfCellsAlongAxis - voxelOverlap);
+            float inflationFactorX = 1.0f + (float)voxelOverlap / (VoxelConfig.VoxelVolumeConfig.NumberOfCellsAlongX - voxelOverlap);
+            float inflationFactorY = 1.0f + (float)voxelOverlap / (VoxelConfig.VoxelVolumeConfig.NumberOfCellsAlongY - voxelOverlap);
+            float inflationFactorZ = 1.0f + (float)voxelOverlap / (VoxelConfig.VoxelVolumeConfig.NumberOfCellsAlongZ - voxelOverlap);
+            
+            float3 inflationFactors = new float3(inflationFactorX, inflationFactorY, inflationFactorZ);
+            
+            //float inflationFactor = 1.0f + (float)voxelOverlap / (VoxelConfig.VoxelVolumeConfig.NumberOfCellsAlongAxis - voxelOverlap);
 
-            return VoxelConfig.VoxelVolumeConfig.VoxelVolumeDimensions / inflationFactor;
+            return VoxelConfig.VoxelVolumeConfig.VoxelVolumeDimensions / inflationFactors;
         }
 
         public int3 CalculateChunkCoordinate(float3 position) => new int3((int)math.round(position.x / m_chunkDimensions.x), 0, (int)math.round(position.z / m_chunkDimensions.z));
@@ -407,32 +478,7 @@ namespace Tuntenfisch.World
                 return int3.zero; // 유효하지 않은 경우, 기본값 반환
             }
         }
-
-        public async UniTask ExportChunksInView()
-        {
-            
-            var chunksSnapshot = new Dictionary<int3, Chunk>(m_chunks);
-            int totalChunks = chunksSnapshot.Count;
-            int chunksProcessed = 0;
-
-            m_isSaving = true;
-            m_saveProgressBar.gameObject.SetActive(true);
-                
-            foreach (var chunkPair in chunksSnapshot)
-            {
-                Chunk chunk = chunkPair.Value;
-                await chunk.ExportVolumeDataAsync(m_chunkFileList, m_chunkDirectoryPath);
-
-                chunksProcessed++;
-                UpdateSaveProgress(chunksProcessed, totalChunks);
-            }
-
-            m_saveProgressBar.gameObject.SetActive(false);
-            m_isSaving = false;
-            
-            StartCoroutine(ShowSaveMessageCoroutine(3));
-        }
-
+        
         private void UpdateSaveProgress(int chunksProcessed, int totalChunks)
         {
             if (m_saveProgressBar != null)

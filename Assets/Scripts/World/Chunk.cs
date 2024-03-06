@@ -264,6 +264,8 @@ namespace Tuntenfisch.World
         
         public async UniTask ExportVolumeDataAsync(HashSet<int3> chunkFileList, string DirectoryPath)
         {
+            //Debug.Log("ExportVolumeDataAsync");
+            
             int3 chunkCoordinate = WorldManager.Instance.CalculateChunkCoordinate(transform.position);
             
             string fileName = $"chunk_{chunkCoordinate.x}_{chunkCoordinate.y}_{chunkCoordinate.z}.dat";
@@ -282,11 +284,11 @@ namespace Tuntenfisch.World
 
             
             uint[] bufferDataCopy = request.GetData<uint>().ToArray();
-            await UniTask.RunOnThreadPool(() =>
+            try
             {
-                try
+                await UniTask.Run(() =>
                 {
-                    using (var fs = new FileStream(filePath, FileMode.Create, FileAccess.Write))
+                    using (var fs = new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.Read))
                     using (var writer = new BinaryWriter(fs))
                     {
                         foreach (uint item in bufferDataCopy)
@@ -294,12 +296,12 @@ namespace Tuntenfisch.World
                             writer.Write(item);
                         }
                     }
-                }
-                catch (Exception e)
-                {
-                    Debug.LogError($"Failed to write file: {e}");
-                }
-            });
+                }, cancellationToken: this.GetCancellationTokenOnDestroy());
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"Failed to write file: {e}");
+            }
 
             chunkFileList.Add(chunkCoordinate);
 

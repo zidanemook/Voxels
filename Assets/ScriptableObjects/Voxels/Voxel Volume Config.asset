@@ -12,6 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 64b99d1df0af7974ebd7ed4ca409a0c4, type: 3}
   m_Name: Voxel Volume Config
   m_EditorClassIdentifier: 
+  m_numberOfVoxelsAlongX: 67
+  m_numberOfVoxelsAlongY: 387
+  m_numberOfVoxelsAlongZ: 67
   m_compute: {fileID: 7200000, guid: 945078b799b71cc45808878451165ddd, type: 3}
-  m_numberOfVoxelsAlongAxis: 131
   m_voxelSpacing: 1
