@@ -5,6 +5,10 @@ Digging limit
 
 Add InGameMenu
 
-Chunks volumedata disappearing out of the field of view when moving are saved to a file
+After editing Chunks in game it will be exported
 
-When the Save button is pressed, chunks volumedata within the field of view are saved to a file
+Chunk size changed and some code changed for it
+
+
+map Generation graph used for layered volume terrain Snow, Rock, Grass, Dirt, Rock
+

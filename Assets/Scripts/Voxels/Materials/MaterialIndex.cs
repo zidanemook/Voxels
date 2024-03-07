@@ -5,6 +5,7 @@
         Dirt = 0,
         Rock = 1,
         Sand = 2,
-        Grass = 3
+        Grass = 3,
+        Snow = 4,
     }
 }

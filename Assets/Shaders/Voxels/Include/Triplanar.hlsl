@@ -59,6 +59,10 @@ half3 BlendTriplanarNormal(half3 normalTS, half3 normalWS)
 {
     return half3(normalTS.xy + normalWS.xy, normalTS.z * normalWS.z);
 }
+//mohs.x: Represents the metallic value of the material.
+//mohs.y: Represents the occlusion value of the material.
+//mohs.z: Used as a height value in this context. It's used to calculate triplanar weights, which determine how much of each axis's texture is visible on the final material.
+//mohs.w: Represents the smoothness of the material.
 
 TriplanarData ApplyTriplanarTexturing
 (

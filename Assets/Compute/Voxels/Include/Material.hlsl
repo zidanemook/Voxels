@@ -9,8 +9,9 @@ ENUM MaterialIndex
     static const uint Rock = 1;
     static const uint Sand = 2;
     static const uint Grass = 3;
+    static const uint Snow = 4;
 };
 
-static const uint numberOfMaterials = 4;
+static const uint numberOfMaterials = 5;
 
 #endif
