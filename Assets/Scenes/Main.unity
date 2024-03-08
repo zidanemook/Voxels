@@ -461,10 +461,11 @@ MonoBehaviour:
   m_chunkPrefab: {fileID: 6443619016532032082, guid: 3605e23936cdf3f498ff9f218128ac42, type: 3}
   m_initialChunkPoolPopulation: 500
   m_lodDistances:
-  - 404
+  - 300
   - 700
   - 900
   - 1200
+  - 2048
   m_saveProgressBar: {fileID: 521298809}
   m_saveMessageText: {fileID: 1277269306}
 --- !u!114 &337836006
@@ -1549,7 +1550,7 @@ Camera:
     width: 1
     height: 1
   near clip plane: 0.3
-  far clip plane: 1200
+  far clip plane: 2000
   field of view: 60
   orthographic: 0
   orthographic size: 5

@@ -299,7 +299,7 @@ MonoBehaviour:
     y: -160
     z: -50
   m_rotation:
-    x: 0
+    x: 180
     y: 0
     z: 0
   m_scale:
@@ -594,7 +594,7 @@ MonoBehaviour:
   m_transformedPosition: 0
   m_translation:
     x: 20
-    y: -205
+    y: -215
     z: -50
   m_rotation:
     x: 0
@@ -618,7 +618,7 @@ MonoBehaviour:
   m_Name: Output
   m_EditorClassIdentifier: 
   graph: {fileID: 11400000}
-  position: {x: 1032, y: 1512}
+  position: {x: 808, y: 2072}
   ports:
     keys:
     - m_voxel
@@ -1357,7 +1357,7 @@ MonoBehaviour:
       e10: 0
       e11: 1
       e12: 0
-      e13: 205
+      e13: 215
       e20: 0
       e21: 0
       e22: 1

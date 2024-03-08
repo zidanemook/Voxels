@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Voxel Volume Config
   m_EditorClassIdentifier: 
   m_numberOfVoxelsAlongX: 67
-  m_numberOfVoxelsAlongY: 387
+  m_numberOfVoxelsAlongY: 259
   m_numberOfVoxelsAlongZ: 67
   m_compute: {fileID: 7200000, guid: 945078b799b71cc45808878451165ddd, type: 3}
   m_voxelSpacing: 1

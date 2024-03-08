@@ -238,6 +238,8 @@ namespace Tuntenfisch.World
 
             m_bakeJobHandle = new BakeJob(m_mesh.GetInstanceID()).Schedule();
             m_flags |= ChunkFlags.IsBakingMesh;
+            
+ 
         }
 
         private void InitializeMeshComponents()
