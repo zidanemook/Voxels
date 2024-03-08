@@ -293,8 +293,7 @@ namespace Tuntenfisch.World
             float3 chunkPosition = chunkCoordinate * m_chunkDimensions;
             float viewerToChunkDistanceSquared = math.lengthsq(chunkPosition - viewerPosition);
             int lod = CalculateChunkLod(viewerToChunkDistanceSquared);
-            lod = 2; //testcode
-
+            
             m_processedChunkCoordinates.Clear();
             m_chunksToProcess.Clear();
 
