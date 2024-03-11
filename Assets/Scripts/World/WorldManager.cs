@@ -72,7 +72,7 @@ namespace Tuntenfisch.World
         public string ChunkDirectoryPath
         {
             get { return m_chunkDirectoryPath; }
-            private set { m_chunkDirectoryPath = value; } // 필요한 경우 값을 설정할 수 있도록 합니다.
+            private set { m_chunkDirectoryPath = value; }
         }
 
         private bool isExporting = false;
@@ -82,10 +82,12 @@ namespace Tuntenfisch.World
         private float m_updateIntervalSquared;
         private float[] m_lodDistancesSquared;
 
+        public int MaxLOD
+        {
+            get { return m_lodDistances.Length; }
+        }
 
         private string m_worldName;
-        
-        
         
         
         private void Start()
@@ -164,9 +166,6 @@ namespace Tuntenfisch.World
 
             try
             {
-               
-                
-                
                 const float scaleInflationFactor = 1.5f;
 
                 Matrix4x4 worldToObjectMatrix = Matrix4x4.TRS(position, quaternion.identity, scale).inverse;
@@ -305,6 +304,8 @@ namespace Tuntenfisch.World
 
                 if (m_chunks.TryGetValue(chunkCoordinate, out Chunk chunk))
                 {
+                    chunk.CreateVoxelVolumeBuffer();
+                    chunk.RegenerateVoxelVolume();
                     chunk.RegenerateMesh(lod);
                 }
                 else
@@ -316,7 +317,6 @@ namespace Tuntenfisch.World
                         chunk = m_chunkPool.Acquire();
                         chunk.transform.position = chunkPosition;
                         chunk.ImportVoxelVolumeFromFile();
-                        //chunk.RegenerateMesh(lod);
                         if(lod != 0)
                             chunk.TargetLOD = lod;
                         //ImportVolumeDataAsync 에서 chunk.RegenerateMesh(lod); 호출함

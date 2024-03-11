@@ -249,64 +249,6 @@ MonoBehaviour:
     y: 1
     z: 1
   m_invert: 1
---- !u!114 &-7070417385692328423
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fad4100241decd24fa79ae010bc6f528, type: 3}
-  m_Name: Transform
-  m_EditorClassIdentifier: 
-  graph: {fileID: 11400000}
-  position: {x: -664, y: 2104}
-  ports:
-    keys:
-    - m_position
-    - m_transformedPosition
-    values:
-    - _fieldName: m_position
-      _node: {fileID: -7070417385692328423}
-      _typeQualifiedName: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral,
-        PublicKeyToken=b77a5c561934e089
-      connections:
-      - fieldName: m_position
-        node: {fileID: 8415927745012905663}
-        reroutePoints: []
-      _direction: 0
-      _connectionType: 1
-      _typeConstraint: 2
-      _dynamic: 0
-    - _fieldName: m_transformedPosition
-      _node: {fileID: -7070417385692328423}
-      _typeQualifiedName: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral,
-        PublicKeyToken=b77a5c561934e089
-      connections:
-      - fieldName: m_position
-        node: {fileID: -4840092051391857766}
-        reroutePoints: []
-      _direction: 1
-      _connectionType: 1
-      _typeConstraint: 2
-      _dynamic: 0
-  m_position: 0
-  m_transformedPosition: 0
-  m_translation:
-    x: 20
-    y: -160
-    z: -50
-  m_rotation:
-    x: 180
-    y: 0
-    z: 0
-  m_scale:
-    x: 1
-    y: 1
-    z: 1
-  m_invert: 1
 --- !u!114 &-6802060674992945066
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -485,68 +427,6 @@ MonoBehaviour:
     y: 1
     z: 1
   m_invert: 1
---- !u!114 &-4840092051391857766
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e5429f6d037ac7344ba2d53d6f1eb48c, type: 3}
-  m_Name: Noise
-  m_EditorClassIdentifier: 
-  graph: {fileID: 11400000}
-  position: {x: -360, y: 2056}
-  ports:
-    keys:
-    - m_position
-    - m_valueAndGradient
-    values:
-    - _fieldName: m_position
-      _node: {fileID: -4840092051391857766}
-      _typeQualifiedName: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral,
-        PublicKeyToken=b77a5c561934e089
-      connections:
-      - fieldName: m_transformedPosition
-        node: {fileID: -7070417385692328423}
-        reroutePoints: []
-      _direction: 0
-      _connectionType: 1
-      _typeConstraint: 2
-      _dynamic: 0
-    - _fieldName: m_valueAndGradient
-      _node: {fileID: -4840092051391857766}
-      _typeQualifiedName: Unity.Mathematics.float2, Unity.Mathematics, Version=1.0.0.0,
-        Culture=neutral, PublicKeyToken=null
-      connections:
-      - fieldName: m_valueAndGradient
-        node: {fileID: 4449912919632864427}
-        reroutePoints: []
-      _direction: 1
-      _connectionType: 1
-      _typeConstraint: 2
-      _dynamic: 0
-  m_position: 0
-  m_valueAndGradient:
-    x: 0
-    y: 0
-  m_noiseParameters:
-    m_seed: 0
-    m_noiseAxes: 0
-    m_noiseType: 2
-    m_numberOfOctaves: 10
-    m_initialAmplitude: 16
-    m_initialFrequency:
-      x: 0.0006
-      y: 0
-      z: 0.0006
-    m_persistence: 0.17
-    m_lacunarity:
-      x: 6
-      y: 1
-      z: 6
 --- !u!114 &-4775041337344959837
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -618,7 +498,7 @@ MonoBehaviour:
   m_Name: Output
   m_EditorClassIdentifier: 
   graph: {fileID: 11400000}
-  position: {x: 808, y: 2072}
+  position: {x: 632, y: 2280}
   ports:
     keys:
     - m_voxel
@@ -629,7 +509,7 @@ MonoBehaviour:
         Culture=neutral, PublicKeyToken=null
       connections:
       - fieldName: m_voxel
-        node: {fileID: 7956664456007422970}
+        node: {fileID: -1686645418977260223}
         reroutePoints: []
       _direction: 0
       _connectionType: 1
@@ -783,6 +663,64 @@ MonoBehaviour:
       x: 4
       y: 1
       z: 4
+--- !u!114 &-3594684896451353255
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fad4100241decd24fa79ae010bc6f528, type: 3}
+  m_Name: Transform
+  m_EditorClassIdentifier: 
+  graph: {fileID: 11400000}
+  position: {x: -360, y: 2232}
+  ports:
+    keys:
+    - m_position
+    - m_transformedPosition
+    values:
+    - _fieldName: m_position
+      _node: {fileID: -3594684896451353255}
+      _typeQualifiedName: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral,
+        PublicKeyToken=b77a5c561934e089
+      connections:
+      - fieldName: m_position
+        node: {fileID: 2923679917000200516}
+        reroutePoints: []
+      _direction: 0
+      _connectionType: 1
+      _typeConstraint: 2
+      _dynamic: 0
+    - _fieldName: m_transformedPosition
+      _node: {fileID: -3594684896451353255}
+      _typeQualifiedName: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral,
+        PublicKeyToken=b77a5c561934e089
+      connections:
+      - fieldName: m_position
+        node: {fileID: 6196480277426231680}
+        reroutePoints: []
+      _direction: 1
+      _connectionType: 1
+      _typeConstraint: 2
+      _dynamic: 0
+  m_position: 0
+  m_transformedPosition: 0
+  m_translation:
+    x: 0
+    y: -100
+    z: 0
+  m_rotation:
+    x: 0
+    y: 0
+    z: 0
+  m_scale:
+    x: 1
+    y: 1
+    z: 1
+  m_invert: 1
 --- !u!114 &-2949473973526596843
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1009,6 +947,57 @@ MonoBehaviour:
       _typeConstraint: 2
       _dynamic: 0
   m_position: 0
+--- !u!114 &-1686645418977260223
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 25e2bd3a7378b0a48bc020065a879054, type: 3}
+  m_Name: Material
+  m_EditorClassIdentifier: 
+  graph: {fileID: 11400000}
+  position: {x: 312, y: 2248}
+  ports:
+    keys:
+    - m_valueAndGradient
+    - m_voxel
+    values:
+    - _fieldName: m_valueAndGradient
+      _node: {fileID: -1686645418977260223}
+      _typeQualifiedName: Unity.Mathematics.float2, Unity.Mathematics, Version=1.0.0.0,
+        Culture=neutral, PublicKeyToken=null
+      connections:
+      - fieldName: m_valueAndGradient
+        node: {fileID: 6196480277426231680}
+        reroutePoints: []
+      _direction: 0
+      _connectionType: 1
+      _typeConstraint: 2
+      _dynamic: 0
+    - _fieldName: m_voxel
+      _node: {fileID: -1686645418977260223}
+      _typeQualifiedName: Unity.Mathematics.float3, Unity.Mathematics, Version=1.0.0.0,
+        Culture=neutral, PublicKeyToken=null
+      connections:
+      - fieldName: m_voxel
+        node: {fileID: -4527227182196153878}
+        reroutePoints: []
+      _direction: 1
+      _connectionType: 1
+      _typeConstraint: 2
+      _dynamic: 0
+  m_valueAndGradient:
+    x: 0
+    y: 0
+  m_voxel:
+    x: 0
+    y: 0
+    z: 0
+  m_materialIndex: 3
 --- !u!114 &-1244207437923045000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1304,10 +1293,10 @@ MonoBehaviour:
   - {fileID: -6595711930467488177}
   - {fileID: -7208507807925267196}
   - {fileID: 3851963815714264397}
-  - {fileID: -4840092051391857766}
-  - {fileID: 4449912919632864427}
-  - {fileID: 8415927745012905663}
-  - {fileID: -7070417385692328423}
+  - {fileID: 6196480277426231680}
+  - {fileID: -1686645418977260223}
+  - {fileID: 2923679917000200516}
+  - {fileID: -3594684896451353255}
   m_nodes:
   - m_nodeType: 0
     m_transformMatrix:
@@ -1353,552 +1342,6 @@ MonoBehaviour:
       e00: 1
       e01: 0
       e02: 0
-      e03: -20
-      e10: 0
-      e11: 1
-      e12: 0
-      e13: 215
-      e20: 0
-      e21: 0
-      e22: 1
-      e23: 50
-      e30: 0
-      e31: 0
-      e32: 0
-      e33: 1
-    m_noiseParameters:
-      m_seed: 0
-      m_noiseAxes: 0
-      m_noiseType: 0
-      m_numberOfOctaves: 0
-      m_initialAmplitude: 0
-      m_initialFrequency:
-        x: 0
-        y: 0
-        z: 0
-      m_persistence: 0
-      m_lacunarity:
-        x: 0
-        y: 0
-        z: 0
-    m_csgPrimitive:
-      m_primitiveType: 0
-    m_materialIndex: 0
-    m_csgOperator:
-      m_operatorIndex: 0
-      m_smoothing: 0
-  - m_nodeType: 3
-    m_transformMatrix:
-      e00: 1
-      e01: 0
-      e02: 0
-      e03: 0
-      e10: 0
-      e11: 1
-      e12: 0
-      e13: 0
-      e20: 0
-      e21: 0
-      e22: 1
-      e23: 0
-      e30: 0
-      e31: 0
-      e32: 0
-      e33: 1
-    m_noiseParameters:
-      m_seed: 0
-      m_noiseAxes: 0
-      m_noiseType: 2
-      m_numberOfOctaves: 10
-      m_initialAmplitude: 17
-      m_initialFrequency:
-        x: 0.0006
-        y: 0
-        z: 0.0006
-      m_persistence: 0.17
-      m_lacunarity:
-        x: 4
-        y: 1
-        z: 4
-    m_csgPrimitive:
-      m_primitiveType: 0
-    m_materialIndex: 0
-    m_csgOperator:
-      m_operatorIndex: 0
-      m_smoothing: 0
-  - m_nodeType: 5
-    m_transformMatrix:
-      e00: 1
-      e01: 0
-      e02: 0
-      e03: 0
-      e10: 0
-      e11: 1
-      e12: 0
-      e13: 0
-      e20: 0
-      e21: 0
-      e22: 1
-      e23: 0
-      e30: 0
-      e31: 0
-      e32: 0
-      e33: 1
-    m_noiseParameters:
-      m_seed: 0
-      m_noiseAxes: 0
-      m_noiseType: 0
-      m_numberOfOctaves: 0
-      m_initialAmplitude: 0
-      m_initialFrequency:
-        x: 0
-        y: 0
-        z: 0
-      m_persistence: 0
-      m_lacunarity:
-        x: 0
-        y: 0
-        z: 0
-    m_csgPrimitive:
-      m_primitiveType: 0
-    m_materialIndex: 4
-    m_csgOperator:
-      m_operatorIndex: 0
-      m_smoothing: 0
-  - m_nodeType: 0
-    m_transformMatrix:
-      e00: 1
-      e01: 0
-      e02: 0
-      e03: 0
-      e10: 0
-      e11: 1
-      e12: 0
-      e13: 0
-      e20: 0
-      e21: 0
-      e22: 1
-      e23: 0
-      e30: 0
-      e31: 0
-      e32: 0
-      e33: 1
-    m_noiseParameters:
-      m_seed: 0
-      m_noiseAxes: 0
-      m_noiseType: 0
-      m_numberOfOctaves: 0
-      m_initialAmplitude: 0
-      m_initialFrequency:
-        x: 0
-        y: 0
-        z: 0
-      m_persistence: 0
-      m_lacunarity:
-        x: 0
-        y: 0
-        z: 0
-    m_csgPrimitive:
-      m_primitiveType: 0
-    m_materialIndex: 0
-    m_csgOperator:
-      m_operatorIndex: 0
-      m_smoothing: 0
-  - m_nodeType: 1
-    m_transformMatrix:
-      e00: 1
-      e01: 0
-      e02: 0
-      e03: -20
-      e10: 0
-      e11: 1
-      e12: 0
-      e13: 160
-      e20: 0
-      e21: 0
-      e22: 1
-      e23: 50
-      e30: 0
-      e31: 0
-      e32: 0
-      e33: 1
-    m_noiseParameters:
-      m_seed: 0
-      m_noiseAxes: 0
-      m_noiseType: 0
-      m_numberOfOctaves: 0
-      m_initialAmplitude: 0
-      m_initialFrequency:
-        x: 0
-        y: 0
-        z: 0
-      m_persistence: 0
-      m_lacunarity:
-        x: 0
-        y: 0
-        z: 0
-    m_csgPrimitive:
-      m_primitiveType: 0
-    m_materialIndex: 0
-    m_csgOperator:
-      m_operatorIndex: 0
-      m_smoothing: 0
-  - m_nodeType: 3
-    m_transformMatrix:
-      e00: 1
-      e01: 0
-      e02: 0
-      e03: 0
-      e10: 0
-      e11: 1
-      e12: 0
-      e13: 0
-      e20: 0
-      e21: 0
-      e22: 1
-      e23: 0
-      e30: 0
-      e31: 0
-      e32: 0
-      e33: 1
-    m_noiseParameters:
-      m_seed: 0
-      m_noiseAxes: 0
-      m_noiseType: 2
-      m_numberOfOctaves: 10
-      m_initialAmplitude: 16
-      m_initialFrequency:
-        x: 0.0006
-        y: 0
-        z: 0.0006
-      m_persistence: 0.17
-      m_lacunarity:
-        x: 6
-        y: 1
-        z: 6
-    m_csgPrimitive:
-      m_primitiveType: 0
-    m_materialIndex: 0
-    m_csgOperator:
-      m_operatorIndex: 0
-      m_smoothing: 0
-  - m_nodeType: 5
-    m_transformMatrix:
-      e00: 1
-      e01: 0
-      e02: 0
-      e03: 0
-      e10: 0
-      e11: 1
-      e12: 0
-      e13: 0
-      e20: 0
-      e21: 0
-      e22: 1
-      e23: 0
-      e30: 0
-      e31: 0
-      e32: 0
-      e33: 1
-    m_noiseParameters:
-      m_seed: 0
-      m_noiseAxes: 0
-      m_noiseType: 0
-      m_numberOfOctaves: 0
-      m_initialAmplitude: 0
-      m_initialFrequency:
-        x: 0
-        y: 0
-        z: 0
-      m_persistence: 0
-      m_lacunarity:
-        x: 0
-        y: 0
-        z: 0
-    m_csgPrimitive:
-      m_primitiveType: 0
-    m_materialIndex: 1
-    m_csgOperator:
-      m_operatorIndex: 0
-      m_smoothing: 0
-  - m_nodeType: 6
-    m_transformMatrix:
-      e00: 1
-      e01: 0
-      e02: 0
-      e03: 0
-      e10: 0
-      e11: 1
-      e12: 0
-      e13: 0
-      e20: 0
-      e21: 0
-      e22: 1
-      e23: 0
-      e30: 0
-      e31: 0
-      e32: 0
-      e33: 1
-    m_noiseParameters:
-      m_seed: 0
-      m_noiseAxes: 0
-      m_noiseType: 0
-      m_numberOfOctaves: 0
-      m_initialAmplitude: 0
-      m_initialFrequency:
-        x: 0
-        y: 0
-        z: 0
-      m_persistence: 0
-      m_lacunarity:
-        x: 0
-        y: 0
-        z: 0
-    m_csgPrimitive:
-      m_primitiveType: 0
-    m_materialIndex: 0
-    m_csgOperator:
-      m_operatorIndex: 2
-      m_smoothing: 0
-  - m_nodeType: 0
-    m_transformMatrix:
-      e00: 1
-      e01: 0
-      e02: 0
-      e03: 0
-      e10: 0
-      e11: 1
-      e12: 0
-      e13: 0
-      e20: 0
-      e21: 0
-      e22: 1
-      e23: 0
-      e30: 0
-      e31: 0
-      e32: 0
-      e33: 1
-    m_noiseParameters:
-      m_seed: 0
-      m_noiseAxes: 0
-      m_noiseType: 0
-      m_numberOfOctaves: 0
-      m_initialAmplitude: 0
-      m_initialFrequency:
-        x: 0
-        y: 0
-        z: 0
-      m_persistence: 0
-      m_lacunarity:
-        x: 0
-        y: 0
-        z: 0
-    m_csgPrimitive:
-      m_primitiveType: 0
-    m_materialIndex: 0
-    m_csgOperator:
-      m_operatorIndex: 0
-      m_smoothing: 0
-  - m_nodeType: 1
-    m_transformMatrix:
-      e00: 1
-      e01: 0
-      e02: 0
-      e03: -20
-      e10: 0
-      e11: 1
-      e12: 0
-      e13: 160
-      e20: 0
-      e21: 0
-      e22: 1
-      e23: 50
-      e30: 0
-      e31: 0
-      e32: 0
-      e33: 1
-    m_noiseParameters:
-      m_seed: 0
-      m_noiseAxes: 0
-      m_noiseType: 0
-      m_numberOfOctaves: 0
-      m_initialAmplitude: 0
-      m_initialFrequency:
-        x: 0
-        y: 0
-        z: 0
-      m_persistence: 0
-      m_lacunarity:
-        x: 0
-        y: 0
-        z: 0
-    m_csgPrimitive:
-      m_primitiveType: 0
-    m_materialIndex: 0
-    m_csgOperator:
-      m_operatorIndex: 0
-      m_smoothing: 0
-  - m_nodeType: 3
-    m_transformMatrix:
-      e00: 1
-      e01: 0
-      e02: 0
-      e03: 0
-      e10: 0
-      e11: 1
-      e12: 0
-      e13: 0
-      e20: 0
-      e21: 0
-      e22: 1
-      e23: 0
-      e30: 0
-      e31: 0
-      e32: 0
-      e33: 1
-    m_noiseParameters:
-      m_seed: 0
-      m_noiseAxes: 0
-      m_noiseType: 2
-      m_numberOfOctaves: 10
-      m_initialAmplitude: 16
-      m_initialFrequency:
-        x: 0.0006
-        y: 0
-        z: 0.0006
-      m_persistence: 0.17
-      m_lacunarity:
-        x: 6
-        y: 1
-        z: 6
-    m_csgPrimitive:
-      m_primitiveType: 0
-    m_materialIndex: 0
-    m_csgOperator:
-      m_operatorIndex: 0
-      m_smoothing: 0
-  - m_nodeType: 5
-    m_transformMatrix:
-      e00: 1
-      e01: 0
-      e02: 0
-      e03: 0
-      e10: 0
-      e11: 1
-      e12: 0
-      e13: 0
-      e20: 0
-      e21: 0
-      e22: 1
-      e23: 0
-      e30: 0
-      e31: 0
-      e32: 0
-      e33: 1
-    m_noiseParameters:
-      m_seed: 0
-      m_noiseAxes: 0
-      m_noiseType: 0
-      m_numberOfOctaves: 0
-      m_initialAmplitude: 0
-      m_initialFrequency:
-        x: 0
-        y: 0
-        z: 0
-      m_persistence: 0
-      m_lacunarity:
-        x: 0
-        y: 0
-        z: 0
-    m_csgPrimitive:
-      m_primitiveType: 0
-    m_materialIndex: 1
-    m_csgOperator:
-      m_operatorIndex: 0
-      m_smoothing: 0
-  - m_nodeType: 6
-    m_transformMatrix:
-      e00: 1
-      e01: 0
-      e02: 0
-      e03: 0
-      e10: 0
-      e11: 1
-      e12: 0
-      e13: 0
-      e20: 0
-      e21: 0
-      e22: 1
-      e23: 0
-      e30: 0
-      e31: 0
-      e32: 0
-      e33: 1
-    m_noiseParameters:
-      m_seed: 0
-      m_noiseAxes: 0
-      m_noiseType: 0
-      m_numberOfOctaves: 0
-      m_initialAmplitude: 0
-      m_initialFrequency:
-        x: 0
-        y: 0
-        z: 0
-      m_persistence: 0
-      m_lacunarity:
-        x: 0
-        y: 0
-        z: 0
-    m_csgPrimitive:
-      m_primitiveType: 0
-    m_materialIndex: 0
-    m_csgOperator:
-      m_operatorIndex: 0
-      m_smoothing: 0
-  - m_nodeType: 0
-    m_transformMatrix:
-      e00: 1
-      e01: 0
-      e02: 0
-      e03: 0
-      e10: 0
-      e11: 1
-      e12: 0
-      e13: 0
-      e20: 0
-      e21: 0
-      e22: 1
-      e23: 0
-      e30: 0
-      e31: 0
-      e32: 0
-      e33: 1
-    m_noiseParameters:
-      m_seed: 0
-      m_noiseAxes: 0
-      m_noiseType: 0
-      m_numberOfOctaves: 0
-      m_initialAmplitude: 0
-      m_initialFrequency:
-        x: 0
-        y: 0
-        z: 0
-      m_persistence: 0
-      m_lacunarity:
-        x: 0
-        y: 0
-        z: 0
-    m_csgPrimitive:
-      m_primitiveType: 0
-    m_materialIndex: 0
-    m_csgOperator:
-      m_operatorIndex: 0
-      m_smoothing: 0
-  - m_nodeType: 1
-    m_transformMatrix:
-      e00: 1
-      e01: 0
-      e02: 0
       e03: 0
       e10: 0
       e11: 1
@@ -2008,1020 +1451,6 @@ MonoBehaviour:
     m_csgPrimitive:
       m_primitiveType: 0
     m_materialIndex: 3
-    m_csgOperator:
-      m_operatorIndex: 0
-      m_smoothing: 0
-  - m_nodeType: 6
-    m_transformMatrix:
-      e00: 1
-      e01: 0
-      e02: 0
-      e03: 0
-      e10: 0
-      e11: 1
-      e12: 0
-      e13: 0
-      e20: 0
-      e21: 0
-      e22: 1
-      e23: 0
-      e30: 0
-      e31: 0
-      e32: 0
-      e33: 1
-    m_noiseParameters:
-      m_seed: 0
-      m_noiseAxes: 0
-      m_noiseType: 0
-      m_numberOfOctaves: 0
-      m_initialAmplitude: 0
-      m_initialFrequency:
-        x: 0
-        y: 0
-        z: 0
-      m_persistence: 0
-      m_lacunarity:
-        x: 0
-        y: 0
-        z: 0
-    m_csgPrimitive:
-      m_primitiveType: 0
-    m_materialIndex: 0
-    m_csgOperator:
-      m_operatorIndex: 2
-      m_smoothing: 0
-  - m_nodeType: 0
-    m_transformMatrix:
-      e00: 1
-      e01: 0
-      e02: 0
-      e03: 0
-      e10: 0
-      e11: 1
-      e12: 0
-      e13: 0
-      e20: 0
-      e21: 0
-      e22: 1
-      e23: 0
-      e30: 0
-      e31: 0
-      e32: 0
-      e33: 1
-    m_noiseParameters:
-      m_seed: 0
-      m_noiseAxes: 0
-      m_noiseType: 0
-      m_numberOfOctaves: 0
-      m_initialAmplitude: 0
-      m_initialFrequency:
-        x: 0
-        y: 0
-        z: 0
-      m_persistence: 0
-      m_lacunarity:
-        x: 0
-        y: 0
-        z: 0
-    m_csgPrimitive:
-      m_primitiveType: 0
-    m_materialIndex: 0
-    m_csgOperator:
-      m_operatorIndex: 0
-      m_smoothing: 0
-  - m_nodeType: 1
-    m_transformMatrix:
-      e00: 1
-      e01: 0
-      e02: 0
-      e03: 0
-      e10: 0
-      e11: 1
-      e12: 0
-      e13: 100
-      e20: 0
-      e21: 0
-      e22: 1
-      e23: 0
-      e30: 0
-      e31: 0
-      e32: 0
-      e33: 1
-    m_noiseParameters:
-      m_seed: 0
-      m_noiseAxes: 0
-      m_noiseType: 0
-      m_numberOfOctaves: 0
-      m_initialAmplitude: 0
-      m_initialFrequency:
-        x: 0
-        y: 0
-        z: 0
-      m_persistence: 0
-      m_lacunarity:
-        x: 0
-        y: 0
-        z: 0
-    m_csgPrimitive:
-      m_primitiveType: 0
-    m_materialIndex: 0
-    m_csgOperator:
-      m_operatorIndex: 0
-      m_smoothing: 0
-  - m_nodeType: 3
-    m_transformMatrix:
-      e00: 1
-      e01: 0
-      e02: 0
-      e03: 0
-      e10: 0
-      e11: 1
-      e12: 0
-      e13: 0
-      e20: 0
-      e21: 0
-      e22: 1
-      e23: 0
-      e30: 0
-      e31: 0
-      e32: 0
-      e33: 1
-    m_noiseParameters:
-      m_seed: 0
-      m_noiseAxes: 0
-      m_noiseType: 2
-      m_numberOfOctaves: 10
-      m_initialAmplitude: 14
-      m_initialFrequency:
-        x: 0.0005
-        y: 0
-        z: 0.0005
-      m_persistence: 0.12
-      m_lacunarity:
-        x: 6
-        y: 1
-        z: 6
-    m_csgPrimitive:
-      m_primitiveType: 0
-    m_materialIndex: 0
-    m_csgOperator:
-      m_operatorIndex: 0
-      m_smoothing: 0
-  - m_nodeType: 5
-    m_transformMatrix:
-      e00: 1
-      e01: 0
-      e02: 0
-      e03: 0
-      e10: 0
-      e11: 1
-      e12: 0
-      e13: 0
-      e20: 0
-      e21: 0
-      e22: 1
-      e23: 0
-      e30: 0
-      e31: 0
-      e32: 0
-      e33: 1
-    m_noiseParameters:
-      m_seed: 0
-      m_noiseAxes: 0
-      m_noiseType: 0
-      m_numberOfOctaves: 0
-      m_initialAmplitude: 0
-      m_initialFrequency:
-        x: 0
-        y: 0
-        z: 0
-      m_persistence: 0
-      m_lacunarity:
-        x: 0
-        y: 0
-        z: 0
-    m_csgPrimitive:
-      m_primitiveType: 0
-    m_materialIndex: 3
-    m_csgOperator:
-      m_operatorIndex: 0
-      m_smoothing: 0
-  - m_nodeType: 6
-    m_transformMatrix:
-      e00: 1
-      e01: 0
-      e02: 0
-      e03: 0
-      e10: 0
-      e11: 1
-      e12: 0
-      e13: 0
-      e20: 0
-      e21: 0
-      e22: 1
-      e23: 0
-      e30: 0
-      e31: 0
-      e32: 0
-      e33: 1
-    m_noiseParameters:
-      m_seed: 0
-      m_noiseAxes: 0
-      m_noiseType: 0
-      m_numberOfOctaves: 0
-      m_initialAmplitude: 0
-      m_initialFrequency:
-        x: 0
-        y: 0
-        z: 0
-      m_persistence: 0
-      m_lacunarity:
-        x: 0
-        y: 0
-        z: 0
-    m_csgPrimitive:
-      m_primitiveType: 0
-    m_materialIndex: 0
-    m_csgOperator:
-      m_operatorIndex: 0
-      m_smoothing: 0
-  - m_nodeType: 0
-    m_transformMatrix:
-      e00: 1
-      e01: 0
-      e02: 0
-      e03: 0
-      e10: 0
-      e11: 1
-      e12: 0
-      e13: 0
-      e20: 0
-      e21: 0
-      e22: 1
-      e23: 0
-      e30: 0
-      e31: 0
-      e32: 0
-      e33: 1
-    m_noiseParameters:
-      m_seed: 0
-      m_noiseAxes: 0
-      m_noiseType: 0
-      m_numberOfOctaves: 0
-      m_initialAmplitude: 0
-      m_initialFrequency:
-        x: 0
-        y: 0
-        z: 0
-      m_persistence: 0
-      m_lacunarity:
-        x: 0
-        y: 0
-        z: 0
-    m_csgPrimitive:
-      m_primitiveType: 0
-    m_materialIndex: 0
-    m_csgOperator:
-      m_operatorIndex: 0
-      m_smoothing: 0
-  - m_nodeType: 1
-    m_transformMatrix:
-      e00: 1
-      e01: 0
-      e02: 0
-      e03: 0
-      e10: 0
-      e11: 1
-      e12: 0
-      e13: 103
-      e20: 0
-      e21: 0
-      e22: 1
-      e23: 0
-      e30: 0
-      e31: 0
-      e32: 0
-      e33: 1
-    m_noiseParameters:
-      m_seed: 0
-      m_noiseAxes: 0
-      m_noiseType: 0
-      m_numberOfOctaves: 0
-      m_initialAmplitude: 0
-      m_initialFrequency:
-        x: 0
-        y: 0
-        z: 0
-      m_persistence: 0
-      m_lacunarity:
-        x: 0
-        y: 0
-        z: 0
-    m_csgPrimitive:
-      m_primitiveType: 0
-    m_materialIndex: 0
-    m_csgOperator:
-      m_operatorIndex: 0
-      m_smoothing: 0
-  - m_nodeType: 3
-    m_transformMatrix:
-      e00: 1
-      e01: 0
-      e02: 0
-      e03: 0
-      e10: 0
-      e11: 1
-      e12: 0
-      e13: 0
-      e20: 0
-      e21: 0
-      e22: 1
-      e23: 0
-      e30: 0
-      e31: 0
-      e32: 0
-      e33: 1
-    m_noiseParameters:
-      m_seed: 0
-      m_noiseAxes: 0
-      m_noiseType: 2
-      m_numberOfOctaves: 10
-      m_initialAmplitude: 14
-      m_initialFrequency:
-        x: 0.0005
-        y: 0
-        z: 0.0005
-      m_persistence: 0.12
-      m_lacunarity:
-        x: 6
-        y: 1
-        z: 6
-    m_csgPrimitive:
-      m_primitiveType: 0
-    m_materialIndex: 0
-    m_csgOperator:
-      m_operatorIndex: 0
-      m_smoothing: 0
-  - m_nodeType: 5
-    m_transformMatrix:
-      e00: 1
-      e01: 0
-      e02: 0
-      e03: 0
-      e10: 0
-      e11: 1
-      e12: 0
-      e13: 0
-      e20: 0
-      e21: 0
-      e22: 1
-      e23: 0
-      e30: 0
-      e31: 0
-      e32: 0
-      e33: 1
-    m_noiseParameters:
-      m_seed: 0
-      m_noiseAxes: 0
-      m_noiseType: 0
-      m_numberOfOctaves: 0
-      m_initialAmplitude: 0
-      m_initialFrequency:
-        x: 0
-        y: 0
-        z: 0
-      m_persistence: 0
-      m_lacunarity:
-        x: 0
-        y: 0
-        z: 0
-    m_csgPrimitive:
-      m_primitiveType: 0
-    m_materialIndex: 0
-    m_csgOperator:
-      m_operatorIndex: 0
-      m_smoothing: 0
-  - m_nodeType: 6
-    m_transformMatrix:
-      e00: 1
-      e01: 0
-      e02: 0
-      e03: 0
-      e10: 0
-      e11: 1
-      e12: 0
-      e13: 0
-      e20: 0
-      e21: 0
-      e22: 1
-      e23: 0
-      e30: 0
-      e31: 0
-      e32: 0
-      e33: 1
-    m_noiseParameters:
-      m_seed: 0
-      m_noiseAxes: 0
-      m_noiseType: 0
-      m_numberOfOctaves: 0
-      m_initialAmplitude: 0
-      m_initialFrequency:
-        x: 0
-        y: 0
-        z: 0
-      m_persistence: 0
-      m_lacunarity:
-        x: 0
-        y: 0
-        z: 0
-    m_csgPrimitive:
-      m_primitiveType: 0
-    m_materialIndex: 0
-    m_csgOperator:
-      m_operatorIndex: 2
-      m_smoothing: 0
-  - m_nodeType: 0
-    m_transformMatrix:
-      e00: 1
-      e01: 0
-      e02: 0
-      e03: 0
-      e10: 0
-      e11: 1
-      e12: 0
-      e13: 0
-      e20: 0
-      e21: 0
-      e22: 1
-      e23: 0
-      e30: 0
-      e31: 0
-      e32: 0
-      e33: 1
-    m_noiseParameters:
-      m_seed: 0
-      m_noiseAxes: 0
-      m_noiseType: 0
-      m_numberOfOctaves: 0
-      m_initialAmplitude: 0
-      m_initialFrequency:
-        x: 0
-        y: 0
-        z: 0
-      m_persistence: 0
-      m_lacunarity:
-        x: 0
-        y: 0
-        z: 0
-    m_csgPrimitive:
-      m_primitiveType: 0
-    m_materialIndex: 0
-    m_csgOperator:
-      m_operatorIndex: 0
-      m_smoothing: 0
-  - m_nodeType: 1
-    m_transformMatrix:
-      e00: 1
-      e01: 0
-      e02: 0
-      e03: 0
-      e10: 0
-      e11: 1
-      e12: 0
-      e13: 103
-      e20: 0
-      e21: 0
-      e22: 1
-      e23: 0
-      e30: 0
-      e31: 0
-      e32: 0
-      e33: 1
-    m_noiseParameters:
-      m_seed: 0
-      m_noiseAxes: 0
-      m_noiseType: 0
-      m_numberOfOctaves: 0
-      m_initialAmplitude: 0
-      m_initialFrequency:
-        x: 0
-        y: 0
-        z: 0
-      m_persistence: 0
-      m_lacunarity:
-        x: 0
-        y: 0
-        z: 0
-    m_csgPrimitive:
-      m_primitiveType: 0
-    m_materialIndex: 0
-    m_csgOperator:
-      m_operatorIndex: 0
-      m_smoothing: 0
-  - m_nodeType: 3
-    m_transformMatrix:
-      e00: 1
-      e01: 0
-      e02: 0
-      e03: 0
-      e10: 0
-      e11: 1
-      e12: 0
-      e13: 0
-      e20: 0
-      e21: 0
-      e22: 1
-      e23: 0
-      e30: 0
-      e31: 0
-      e32: 0
-      e33: 1
-    m_noiseParameters:
-      m_seed: 0
-      m_noiseAxes: 0
-      m_noiseType: 2
-      m_numberOfOctaves: 10
-      m_initialAmplitude: 14
-      m_initialFrequency:
-        x: 0.0005
-        y: 0
-        z: 0.0005
-      m_persistence: 0.12
-      m_lacunarity:
-        x: 6
-        y: 1
-        z: 6
-    m_csgPrimitive:
-      m_primitiveType: 0
-    m_materialIndex: 0
-    m_csgOperator:
-      m_operatorIndex: 0
-      m_smoothing: 0
-  - m_nodeType: 5
-    m_transformMatrix:
-      e00: 1
-      e01: 0
-      e02: 0
-      e03: 0
-      e10: 0
-      e11: 1
-      e12: 0
-      e13: 0
-      e20: 0
-      e21: 0
-      e22: 1
-      e23: 0
-      e30: 0
-      e31: 0
-      e32: 0
-      e33: 1
-    m_noiseParameters:
-      m_seed: 0
-      m_noiseAxes: 0
-      m_noiseType: 0
-      m_numberOfOctaves: 0
-      m_initialAmplitude: 0
-      m_initialFrequency:
-        x: 0
-        y: 0
-        z: 0
-      m_persistence: 0
-      m_lacunarity:
-        x: 0
-        y: 0
-        z: 0
-    m_csgPrimitive:
-      m_primitiveType: 0
-    m_materialIndex: 0
-    m_csgOperator:
-      m_operatorIndex: 0
-      m_smoothing: 0
-  - m_nodeType: 6
-    m_transformMatrix:
-      e00: 1
-      e01: 0
-      e02: 0
-      e03: 0
-      e10: 0
-      e11: 1
-      e12: 0
-      e13: 0
-      e20: 0
-      e21: 0
-      e22: 1
-      e23: 0
-      e30: 0
-      e31: 0
-      e32: 0
-      e33: 1
-    m_noiseParameters:
-      m_seed: 0
-      m_noiseAxes: 0
-      m_noiseType: 0
-      m_numberOfOctaves: 0
-      m_initialAmplitude: 0
-      m_initialFrequency:
-        x: 0
-        y: 0
-        z: 0
-      m_persistence: 0
-      m_lacunarity:
-        x: 0
-        y: 0
-        z: 0
-    m_csgPrimitive:
-      m_primitiveType: 0
-    m_materialIndex: 0
-    m_csgOperator:
-      m_operatorIndex: 0
-      m_smoothing: 0
-  - m_nodeType: 0
-    m_transformMatrix:
-      e00: 1
-      e01: 0
-      e02: 0
-      e03: 0
-      e10: 0
-      e11: 1
-      e12: 0
-      e13: 0
-      e20: 0
-      e21: 0
-      e22: 1
-      e23: 0
-      e30: 0
-      e31: 0
-      e32: 0
-      e33: 1
-    m_noiseParameters:
-      m_seed: 0
-      m_noiseAxes: 0
-      m_noiseType: 0
-      m_numberOfOctaves: 0
-      m_initialAmplitude: 0
-      m_initialFrequency:
-        x: 0
-        y: 0
-        z: 0
-      m_persistence: 0
-      m_lacunarity:
-        x: 0
-        y: 0
-        z: 0
-    m_csgPrimitive:
-      m_primitiveType: 0
-    m_materialIndex: 0
-    m_csgOperator:
-      m_operatorIndex: 0
-      m_smoothing: 0
-  - m_nodeType: 1
-    m_transformMatrix:
-      e00: 1
-      e01: 0
-      e02: 0
-      e03: -20
-      e10: 0
-      e11: 1
-      e12: 0
-      e13: 160
-      e20: 0
-      e21: 0
-      e22: 1
-      e23: 50
-      e30: 0
-      e31: 0
-      e32: 0
-      e33: 1
-    m_noiseParameters:
-      m_seed: 0
-      m_noiseAxes: 0
-      m_noiseType: 0
-      m_numberOfOctaves: 0
-      m_initialAmplitude: 0
-      m_initialFrequency:
-        x: 0
-        y: 0
-        z: 0
-      m_persistence: 0
-      m_lacunarity:
-        x: 0
-        y: 0
-        z: 0
-    m_csgPrimitive:
-      m_primitiveType: 0
-    m_materialIndex: 0
-    m_csgOperator:
-      m_operatorIndex: 0
-      m_smoothing: 0
-  - m_nodeType: 3
-    m_transformMatrix:
-      e00: 1
-      e01: 0
-      e02: 0
-      e03: 0
-      e10: 0
-      e11: 1
-      e12: 0
-      e13: 0
-      e20: 0
-      e21: 0
-      e22: 1
-      e23: 0
-      e30: 0
-      e31: 0
-      e32: 0
-      e33: 1
-    m_noiseParameters:
-      m_seed: 0
-      m_noiseAxes: 0
-      m_noiseType: 2
-      m_numberOfOctaves: 10
-      m_initialAmplitude: 16
-      m_initialFrequency:
-        x: 0.0006
-        y: 0
-        z: 0.0006
-      m_persistence: 0.17
-      m_lacunarity:
-        x: 6
-        y: 1
-        z: 6
-    m_csgPrimitive:
-      m_primitiveType: 0
-    m_materialIndex: 0
-    m_csgOperator:
-      m_operatorIndex: 0
-      m_smoothing: 0
-  - m_nodeType: 5
-    m_transformMatrix:
-      e00: 1
-      e01: 0
-      e02: 0
-      e03: 0
-      e10: 0
-      e11: 1
-      e12: 0
-      e13: 0
-      e20: 0
-      e21: 0
-      e22: 1
-      e23: 0
-      e30: 0
-      e31: 0
-      e32: 0
-      e33: 1
-    m_noiseParameters:
-      m_seed: 0
-      m_noiseAxes: 0
-      m_noiseType: 0
-      m_numberOfOctaves: 0
-      m_initialAmplitude: 0
-      m_initialFrequency:
-        x: 0
-        y: 0
-        z: 0
-      m_persistence: 0
-      m_lacunarity:
-        x: 0
-        y: 0
-        z: 0
-    m_csgPrimitive:
-      m_primitiveType: 0
-    m_materialIndex: 1
-    m_csgOperator:
-      m_operatorIndex: 0
-      m_smoothing: 0
-  - m_nodeType: 6
-    m_transformMatrix:
-      e00: 1
-      e01: 0
-      e02: 0
-      e03: 0
-      e10: 0
-      e11: 1
-      e12: 0
-      e13: 0
-      e20: 0
-      e21: 0
-      e22: 1
-      e23: 0
-      e30: 0
-      e31: 0
-      e32: 0
-      e33: 1
-    m_noiseParameters:
-      m_seed: 0
-      m_noiseAxes: 0
-      m_noiseType: 0
-      m_numberOfOctaves: 0
-      m_initialAmplitude: 0
-      m_initialFrequency:
-        x: 0
-        y: 0
-        z: 0
-      m_persistence: 0
-      m_lacunarity:
-        x: 0
-        y: 0
-        z: 0
-    m_csgPrimitive:
-      m_primitiveType: 0
-    m_materialIndex: 0
-    m_csgOperator:
-      m_operatorIndex: 2
-      m_smoothing: 0
-  - m_nodeType: 0
-    m_transformMatrix:
-      e00: 1
-      e01: 0
-      e02: 0
-      e03: 0
-      e10: 0
-      e11: 1
-      e12: 0
-      e13: 0
-      e20: 0
-      e21: 0
-      e22: 1
-      e23: 0
-      e30: 0
-      e31: 0
-      e32: 0
-      e33: 1
-    m_noiseParameters:
-      m_seed: 0
-      m_noiseAxes: 0
-      m_noiseType: 0
-      m_numberOfOctaves: 0
-      m_initialAmplitude: 0
-      m_initialFrequency:
-        x: 0
-        y: 0
-        z: 0
-      m_persistence: 0
-      m_lacunarity:
-        x: 0
-        y: 0
-        z: 0
-    m_csgPrimitive:
-      m_primitiveType: 0
-    m_materialIndex: 0
-    m_csgOperator:
-      m_operatorIndex: 0
-      m_smoothing: 0
-  - m_nodeType: 1
-    m_transformMatrix:
-      e00: 1
-      e01: 0
-      e02: 0
-      e03: -20
-      e10: 0
-      e11: 1
-      e12: 0
-      e13: 160
-      e20: 0
-      e21: 0
-      e22: 1
-      e23: 50
-      e30: 0
-      e31: 0
-      e32: 0
-      e33: 1
-    m_noiseParameters:
-      m_seed: 0
-      m_noiseAxes: 0
-      m_noiseType: 0
-      m_numberOfOctaves: 0
-      m_initialAmplitude: 0
-      m_initialFrequency:
-        x: 0
-        y: 0
-        z: 0
-      m_persistence: 0
-      m_lacunarity:
-        x: 0
-        y: 0
-        z: 0
-    m_csgPrimitive:
-      m_primitiveType: 0
-    m_materialIndex: 0
-    m_csgOperator:
-      m_operatorIndex: 0
-      m_smoothing: 0
-  - m_nodeType: 3
-    m_transformMatrix:
-      e00: 1
-      e01: 0
-      e02: 0
-      e03: 0
-      e10: 0
-      e11: 1
-      e12: 0
-      e13: 0
-      e20: 0
-      e21: 0
-      e22: 1
-      e23: 0
-      e30: 0
-      e31: 0
-      e32: 0
-      e33: 1
-    m_noiseParameters:
-      m_seed: 0
-      m_noiseAxes: 0
-      m_noiseType: 2
-      m_numberOfOctaves: 10
-      m_initialAmplitude: 16
-      m_initialFrequency:
-        x: 0.0006
-        y: 0
-        z: 0.0006
-      m_persistence: 0.17
-      m_lacunarity:
-        x: 6
-        y: 1
-        z: 6
-    m_csgPrimitive:
-      m_primitiveType: 0
-    m_materialIndex: 0
-    m_csgOperator:
-      m_operatorIndex: 0
-      m_smoothing: 0
-  - m_nodeType: 5
-    m_transformMatrix:
-      e00: 1
-      e01: 0
-      e02: 0
-      e03: 0
-      e10: 0
-      e11: 1
-      e12: 0
-      e13: 0
-      e20: 0
-      e21: 0
-      e22: 1
-      e23: 0
-      e30: 0
-      e31: 0
-      e32: 0
-      e33: 1
-    m_noiseParameters:
-      m_seed: 0
-      m_noiseAxes: 0
-      m_noiseType: 0
-      m_numberOfOctaves: 0
-      m_initialAmplitude: 0
-      m_initialFrequency:
-        x: 0
-        y: 0
-        z: 0
-      m_persistence: 0
-      m_lacunarity:
-        x: 0
-        y: 0
-        z: 0
-    m_csgPrimitive:
-      m_primitiveType: 0
-    m_materialIndex: 1
-    m_csgOperator:
-      m_operatorIndex: 0
-      m_smoothing: 0
-  - m_nodeType: 6
-    m_transformMatrix:
-      e00: 1
-      e01: 0
-      e02: 0
-      e03: 0
-      e10: 0
-      e11: 1
-      e12: 0
-      e13: 0
-      e20: 0
-      e21: 0
-      e22: 1
-      e23: 0
-      e30: 0
-      e31: 0
-      e32: 0
-      e33: 1
-    m_noiseParameters:
-      m_seed: 0
-      m_noiseAxes: 0
-      m_noiseType: 0
-      m_numberOfOctaves: 0
-      m_initialAmplitude: 0
-      m_initialFrequency:
-        x: 0
-        y: 0
-        z: 0
-      m_persistence: 0
-      m_lacunarity:
-        x: 0
-        y: 0
-        z: 0
-    m_csgPrimitive:
-      m_primitiveType: 0
-    m_materialIndex: 0
     m_csgOperator:
       m_operatorIndex: 0
       m_smoothing: 0
@@ -3255,6 +1684,37 @@ MonoBehaviour:
       x: 6
       y: 1
       z: 6
+--- !u!114 &2923679917000200516
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d60cd43415ae3fa4190b870e0cab4484, type: 3}
+  m_Name: Position
+  m_EditorClassIdentifier: 
+  graph: {fileID: 11400000}
+  position: {x: -616, y: 2232}
+  ports:
+    keys:
+    - m_position
+    values:
+    - _fieldName: m_position
+      _node: {fileID: 2923679917000200516}
+      _typeQualifiedName: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral,
+        PublicKeyToken=b77a5c561934e089
+      connections:
+      - fieldName: m_position
+        node: {fileID: -3594684896451353255}
+        reroutePoints: []
+      _direction: 1
+      _connectionType: 1
+      _typeConstraint: 2
+      _dynamic: 0
+  m_position: 0
 --- !u!114 &3244752540533147036
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3357,54 +1817,6 @@ MonoBehaviour:
   m_csgOperator:
     m_operatorIndex: 0
     m_smoothing: 0
---- !u!114 &4449912919632864427
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 25e2bd3a7378b0a48bc020065a879054, type: 3}
-  m_Name: Material
-  m_EditorClassIdentifier: 
-  graph: {fileID: 11400000}
-  position: {x: 8, y: 2120}
-  ports:
-    keys:
-    - m_valueAndGradient
-    - m_voxel
-    values:
-    - _fieldName: m_valueAndGradient
-      _node: {fileID: 4449912919632864427}
-      _typeQualifiedName: Unity.Mathematics.float2, Unity.Mathematics, Version=1.0.0.0,
-        Culture=neutral, PublicKeyToken=null
-      connections:
-      - fieldName: m_valueAndGradient
-        node: {fileID: -4840092051391857766}
-        reroutePoints: []
-      _direction: 0
-      _connectionType: 1
-      _typeConstraint: 2
-      _dynamic: 0
-    - _fieldName: m_voxel
-      _node: {fileID: 4449912919632864427}
-      _typeQualifiedName: Unity.Mathematics.float3, Unity.Mathematics, Version=1.0.0.0,
-        Culture=neutral, PublicKeyToken=null
-      connections: []
-      _direction: 1
-      _connectionType: 1
-      _typeConstraint: 2
-      _dynamic: 0
-  m_valueAndGradient:
-    x: 0
-    y: 0
-  m_voxel:
-    x: 0
-    y: 0
-    z: 0
-  m_materialIndex: 1
 --- !u!114 &4561475664132868943
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3645,6 +2057,68 @@ MonoBehaviour:
       connections:
       - fieldName: m_valueAndGradient
         node: {fileID: -929690377450289955}
+        reroutePoints: []
+      _direction: 1
+      _connectionType: 1
+      _typeConstraint: 2
+      _dynamic: 0
+  m_position: 0
+  m_valueAndGradient:
+    x: 0
+    y: 0
+  m_noiseParameters:
+    m_seed: 0
+    m_noiseAxes: 0
+    m_noiseType: 2
+    m_numberOfOctaves: 10
+    m_initialAmplitude: 14
+    m_initialFrequency:
+      x: 0.0005
+      y: 0
+      z: 0.0005
+    m_persistence: 0.12
+    m_lacunarity:
+      x: 6
+      y: 1
+      z: 6
+--- !u!114 &6196480277426231680
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5429f6d037ac7344ba2d53d6f1eb48c, type: 3}
+  m_Name: Noise
+  m_EditorClassIdentifier: 
+  graph: {fileID: 11400000}
+  position: {x: -72, y: 2232}
+  ports:
+    keys:
+    - m_position
+    - m_valueAndGradient
+    values:
+    - _fieldName: m_position
+      _node: {fileID: 6196480277426231680}
+      _typeQualifiedName: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral,
+        PublicKeyToken=b77a5c561934e089
+      connections:
+      - fieldName: m_transformedPosition
+        node: {fileID: -3594684896451353255}
+        reroutePoints: []
+      _direction: 0
+      _connectionType: 1
+      _typeConstraint: 2
+      _dynamic: 0
+    - _fieldName: m_valueAndGradient
+      _node: {fileID: 6196480277426231680}
+      _typeQualifiedName: Unity.Mathematics.float2, Unity.Mathematics, Version=1.0.0.0,
+        Culture=neutral, PublicKeyToken=null
+      connections:
+      - fieldName: m_valueAndGradient
+        node: {fileID: -1686645418977260223}
         reroutePoints: []
       _direction: 1
       _connectionType: 1
@@ -4074,10 +2548,7 @@ MonoBehaviour:
       _node: {fileID: 7956664456007422970}
       _typeQualifiedName: Unity.Mathematics.float3, Unity.Mathematics, Version=1.0.0.0,
         Culture=neutral, PublicKeyToken=null
-      connections:
-      - fieldName: m_voxel
-        node: {fileID: -4527227182196153878}
-        reroutePoints: []
+      connections: []
       _direction: 1
       _connectionType: 1
       _typeConstraint: 2
@@ -4226,37 +2697,6 @@ MonoBehaviour:
     y: 1
     z: 1
   m_invert: 1
---- !u!114 &8415927745012905663
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d60cd43415ae3fa4190b870e0cab4484, type: 3}
-  m_Name: Position
-  m_EditorClassIdentifier: 
-  graph: {fileID: 11400000}
-  position: {x: -920, y: 2104}
-  ports:
-    keys:
-    - m_position
-    values:
-    - _fieldName: m_position
-      _node: {fileID: 8415927745012905663}
-      _typeQualifiedName: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral,
-        PublicKeyToken=b77a5c561934e089
-      connections:
-      - fieldName: m_position
-        node: {fileID: -7070417385692328423}
-        reroutePoints: []
-      _direction: 1
-      _connectionType: 1
-      _typeConstraint: 2
-      _dynamic: 0
-  m_position: 0
 --- !u!114 &8418150401180615344
 MonoBehaviour:
   m_ObjectHideFlags: 0

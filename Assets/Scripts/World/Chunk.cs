@@ -27,10 +27,10 @@ namespace Tuntenfisch.World
         {
             set { m_targetLOD = value; }
         }
-        private int m_vertexCount;
-        private int m_triangleCount;
+        private int[] m_vertexCount;
+        private int[] m_triangleCount;
 
-        private Mesh m_mesh;
+        private Mesh[] m_mesh;
         private MeshFilter m_meshFilter;
         private MeshRenderer m_meshRenderer;
         private MeshCollider m_meshCollider;
@@ -44,7 +44,11 @@ namespace Tuntenfisch.World
 
         private void Awake()
         {
+            m_vertexCount = new int[WorldManager.Instance.MaxLOD];
+            m_triangleCount = new int[WorldManager.Instance.MaxLOD];
+            
             WorldManager.VoxelConfig.MaterialConfig.OnDirtied += ApplyRenderMaterial;
+            m_mesh = new Mesh[WorldManager.Instance.MaxLOD];
             InitializeMeshComponents();
             ApplyRenderMaterial();
             m_voxelVolumeCSGOperations = new List<GPUVoxelVolumeCSGOperation>();
@@ -57,6 +61,12 @@ namespace Tuntenfisch.World
                 return;
             }
 
+            if ((m_flags & ChunkFlags.CreateVoxelVolumeBufferRequest) == ChunkFlags.CreateVoxelVolumeBufferRequest)
+            {
+                m_flags &= ~ChunkFlags.CreateVoxelVolumeBufferRequest;
+                CreateBuffers();
+            }
+            
             if ((m_flags & ChunkFlags.VoxelVolumeRegenerationRequested) == ChunkFlags.VoxelVolumeRegenerationRequested)
             {
                 m_flags &= ~ChunkFlags.VoxelVolumeRegenerationRequested;
@@ -84,8 +94,9 @@ namespace Tuntenfisch.World
                 m_request = WorldManager.DualContouring.RequestMeshAsync
                 (
                     m_voxelVolumeBuffer,
-                    m_currentLOD,
-                    m_targetLOD,
+                    //m_currentLOD,
+                    //m_targetLOD,
+                    WorldManager.Instance.MaxLOD,
                     m_vertexCount,
                     m_triangleCount,
                     transform.position,
@@ -97,12 +108,13 @@ namespace Tuntenfisch.World
             {
                 m_flags &= ~ChunkFlags.IsBakingMesh;
                 m_meshCollider.sharedMesh = null;
-                m_meshCollider.sharedMesh = m_mesh;
+                m_meshCollider.sharedMesh = m_mesh[m_currentLOD];
             }
         }
 
         private void OnDestroy()
         {
+            
             WorldManager.VoxelConfig.MaterialConfig.OnDirtied -= ApplyRenderMaterial;
             ReleaseBuffers();
         }
@@ -115,7 +127,13 @@ namespace Tuntenfisch.World
 
         public void OnAcquire()
         {
-            m_currentLOD = m_targetLOD = m_vertexCount = m_triangleCount = -1;
+            m_currentLOD = m_targetLOD = -1;
+            // for (int lod = 0; lod < WorldManager.Instance.MaxLOD; ++lod)
+            // {
+            //     m_vertexCount[lod] = -1;
+            //     m_triangleCount[lod] = -1;
+            // }
+            
             CreateBuffers();
             gameObject.SetActive(true);
         }
@@ -135,7 +153,7 @@ namespace Tuntenfisch.World
         {
             materialIndex = default;
 
-            if (hit.triangleIndex >= m_triangleCount)
+            if (hit.triangleIndex >= m_triangleCount[m_currentLOD])
             {
                 return false;
             }
@@ -182,6 +200,7 @@ namespace Tuntenfisch.World
             }
         }
 
+        public void CreateVoxelVolumeBuffer() => m_flags |= ChunkFlags.CreateVoxelVolumeBufferRequest;
         public void RegenerateVoxelVolume() => m_flags |= ChunkFlags.VoxelVolumeRegenerationRequested;
         public void ImportVoxelVolumeFromFile() => m_flags |= ChunkFlags.VoxelVolumeImportFromFileRequested;
 
@@ -204,14 +223,14 @@ namespace Tuntenfisch.World
             m_flags |= ChunkFlags.CSGOperationPerformed | ChunkFlags.MeshRegenerationRequested;
         }
 
-        private void OnMeshGenerated(NativeArray<GPUVertex> vertices, int vertexCount, int vertexStartIndex, NativeArray<int> triangles, int triangleCount, int triangleStartIndex)
+        private void OnMeshGenerated(NativeArray<GPUVertex>[] vertices, int[] vertexCount, int vertexStartIndex, NativeArray<int>[] triangles, int[] triangleCount, int triangleStartIndex)
         {
             m_request = null;
             m_currentLOD = m_targetLOD;
             m_vertexCount = vertexCount;
             m_triangleCount = triangleCount;
 
-            if (vertexCount == 0 || triangleCount == 0)
+            if (vertexCount[m_currentLOD] == 0 || triangleCount[m_currentLOD] == 0)
             {
                 m_meshFilter.sharedMesh = null;
                 m_meshCollider.sharedMesh = null;
@@ -219,8 +238,8 @@ namespace Tuntenfisch.World
                 return;
             }
 
-            m_mesh.SetVertexBufferParams(vertexCount, GPUVertex.Attributes);
-            m_mesh.SetIndexBufferParams(triangleCount, IndexFormat.UInt32);
+            m_mesh[m_currentLOD].SetVertexBufferParams(vertexCount[m_currentLOD], GPUVertex.Attributes);
+            m_mesh[m_currentLOD].SetIndexBufferParams(triangleCount[m_currentLOD], IndexFormat.UInt32);
 #if !UNITY_EDITOR
             MeshUpdateFlags flags = MeshUpdateFlags.DontNotifyMeshUsers | MeshUpdateFlags.DontRecalculateBounds | MeshUpdateFlags.DontResetBoneBounds | MeshUpdateFlags.DontValidateIndices;
             m_mesh.SetVertexBufferData(vertices, vertexStartIndex, 0, vertexCount, 0, flags);
@@ -228,24 +247,34 @@ namespace Tuntenfisch.World
             m_mesh.SetSubMesh(0, new SubMeshDescriptor(0, triangleCount), flags);
             m_mesh.RecalculateBounds(flags);
 #else
-            m_mesh.SetVertexBufferData(vertices, vertexStartIndex, 0, vertexCount);
-            m_mesh.SetIndexBufferData(triangles, triangleStartIndex, 0, triangleCount);
-            m_mesh.SetSubMesh(0, new SubMeshDescriptor(0, triangleCount));
-            m_mesh.RecalculateBounds(MeshUpdateFlags.DontValidateIndices);
+            m_mesh[m_currentLOD].SetVertexBufferData(vertices[m_currentLOD], vertexStartIndex, 0, vertexCount[m_currentLOD]);
+            m_mesh[m_currentLOD].SetIndexBufferData(triangles[m_currentLOD], triangleStartIndex, 0, triangleCount[m_currentLOD]);
+            m_mesh[m_currentLOD].SetSubMesh(0, new SubMeshDescriptor(0, triangleCount[m_currentLOD]));
+            m_mesh[m_currentLOD].RecalculateBounds(MeshUpdateFlags.DontValidateIndices);
 #endif
-            m_meshFilter.sharedMesh = null;
-            m_meshFilter.sharedMesh = m_mesh;
+            
+        }
 
-            m_bakeJobHandle = new BakeJob(m_mesh.GetInstanceID()).Schedule();
+        private void OnLODChanged()
+        {
+            m_meshFilter.sharedMesh = null;
+            m_meshFilter.sharedMesh = m_mesh[m_currentLOD];
+
+            m_bakeJobHandle = new BakeJob(m_mesh[m_currentLOD].GetInstanceID()).Schedule();
             m_flags |= ChunkFlags.IsBakingMesh;
             
- 
+            if(m_targetLOD != 0)
+                ReleaseBuffers();
         }
 
         private void InitializeMeshComponents()
         {
-            m_mesh = new Mesh();
-            m_mesh.MarkDynamic();
+            for (int lod = 0; lod < WorldManager.Instance.MaxLOD; ++lod)
+            {
+                m_mesh[lod] = new Mesh();
+                m_mesh[lod].MarkDynamic();
+            }
+                
             m_meshFilter = GetComponent<MeshFilter>();
             m_meshRenderer = GetComponent<MeshRenderer>();
             m_meshCollider = GetComponent<MeshCollider>();
@@ -253,15 +282,16 @@ namespace Tuntenfisch.World
         }
 
         private void ApplyRenderMaterial() => m_meshRenderer.material = WorldManager.VoxelConfig.MaterialConfig.RenderMaterial;
-
+        
         [Flags]
         private enum ChunkFlags
         {
-            VoxelVolumeRegenerationRequested = 1,
-            CSGOperationPerformed = 2,
-            MeshRegenerationRequested = 4,
-            IsBakingMesh = 8,
-            VoxelVolumeImportFromFileRequested = 16
+            CreateVoxelVolumeBufferRequest = 1,
+            VoxelVolumeRegenerationRequested = 2,
+            CSGOperationPerformed = 4,
+            MeshRegenerationRequested = 8,
+            IsBakingMesh = 16,
+            VoxelVolumeImportFromFileRequested = 32
         }
         
         public async UniTask ExportVolumeDataAsync(HashSet<int3> chunkFileList, string DirectoryPath)

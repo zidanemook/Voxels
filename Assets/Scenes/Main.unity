@@ -464,8 +464,7 @@ MonoBehaviour:
   - 300
   - 700
   - 900
-  - 1200
-  - 2048
+  - 1024
   m_saveProgressBar: {fileID: 521298809}
   m_saveMessageText: {fileID: 1277269306}
 --- !u!114 &337836006
@@ -1550,7 +1549,7 @@ Camera:
     width: 1
     height: 1
   near clip plane: 0.3
-  far clip plane: 2000
+  far clip plane: 1000
   field of view: 60
   orthographic: 0
   orthographic size: 5
