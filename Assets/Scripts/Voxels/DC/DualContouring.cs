@@ -216,9 +216,11 @@ namespace Tuntenfisch.Voxels.DC
                             // If we retrieved too few vertices/triangles, we need to start another readback to retrieve the correct count.
                             m_generatedVerticesBuffer0[lod].StartReadbackNonAlloc(ref m_generatedVertices[lod], VertexCount[lod]);
                             m_generatedTrianglesBuffer[lod].StartReadbackNonAlloc(ref m_generatedTriangles[lod], TriangleCount[lod] + 2);
-
+                            
+                        }
+                        else
+                        {
                             m_lodProcessed[lod] = true;
-                            //return Status.WaitingForGPUReadback;
                         }
                     }
                     else
@@ -226,8 +228,16 @@ namespace Tuntenfisch.Voxels.DC
                         return Status.WaitingForGPUReadback;        
                     }
                 }
+
+                for (int lod = 0; lod < WorldManager.Instance.MaxLOD; ++lod)
+                {
+                    if (false == m_lodProcessed[lod])
+                    {
+                        return Status.WaitingForGPUReadback; 
+                    }
+                }
                 
-                return Status.Done;
+               return Status.Done;
             }
 
             public void GenerateMeshAsync(Task task)
