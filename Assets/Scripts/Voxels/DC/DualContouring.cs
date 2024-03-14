@@ -116,6 +116,7 @@ namespace Tuntenfisch.Voxels.DC
         private async UniTaskVoid DispatchWorkerUniTask(Worker.Task task)
         {
             Worker worker = m_availableWorkers.Pop();
+
             worker.GenerateMeshAsync(task);
 
             do
@@ -161,15 +162,15 @@ namespace Tuntenfisch.Voxels.DC
             private AsyncComputeBuffer[] m_generatedVerticesBuffer0;
             private AsyncComputeBuffer[] m_generatedVerticesBuffer1;
             private AsyncComputeBuffer[] m_generatedTrianglesBuffer;
-            private bool[] m_lodProcessed;
-            
+            private bool[] m_startedReadbackinProcess;
+
             public Worker(DualContouring parent)
             {
                 m_parent = parent;
                 m_parent.m_voxelConfig.VoxelVolumeConfig.OnDirtied += CreateBuffers;
                 m_parent.OnDestroyed += Dispose;
                 
-                m_lodProcessed = new bool[WorldManager.Instance.MaxLOD];
+                m_startedReadbackinProcess = new bool[WorldManager.Instance.MaxLOD];
                 m_generatedVertices = new NativeArray<GPUVertex>[WorldManager.Instance.MaxLOD];
                 m_generatedTriangles = new NativeArray<int>[WorldManager.Instance.MaxLOD];
                 m_cellVertexInfoLookupTableBuffer = new AsyncComputeBuffer[WorldManager.Instance.MaxLOD];
@@ -197,7 +198,7 @@ namespace Tuntenfisch.Voxels.DC
                 {
                     if (m_generatedVerticesBuffer0[lod].IsDataAvailable() && m_generatedTrianglesBuffer[lod].IsDataAvailable())
                     {
-                        if (true == m_lodProcessed[lod])
+                        if (true == m_startedReadbackinProcess[lod])
                         {
                             continue;
                         }
@@ -216,11 +217,7 @@ namespace Tuntenfisch.Voxels.DC
                             // If we retrieved too few vertices/triangles, we need to start another readback to retrieve the correct count.
                             m_generatedVerticesBuffer0[lod].StartReadbackNonAlloc(ref m_generatedVertices[lod], VertexCount[lod]);
                             m_generatedTrianglesBuffer[lod].StartReadbackNonAlloc(ref m_generatedTriangles[lod], TriangleCount[lod] + 2);
-                            
-                        }
-                        else
-                        {
-                            m_lodProcessed[lod] = true;
+                            m_startedReadbackinProcess[lod] = true;
                         }
                     }
                     else
@@ -231,9 +228,17 @@ namespace Tuntenfisch.Voxels.DC
 
                 for (int lod = 0; lod < WorldManager.Instance.MaxLOD; ++lod)
                 {
-                    if (false == m_lodProcessed[lod])
+                    if (false == m_startedReadbackinProcess[lod] || false == m_generatedVerticesBuffer0[lod].IsDataAvailable() || false == m_generatedTrianglesBuffer[lod].IsDataAvailable())
                     {
                         return Status.WaitingForGPUReadback; 
+                    }
+                    else
+                    {
+                        if(m_generatedVerticesBuffer0[lod].ReadbackInProgress)
+                            m_generatedVerticesBuffer0[lod].EndReadback();
+                        
+                        if(m_generatedTrianglesBuffer[lod].ReadbackInProgress)
+                            m_generatedTrianglesBuffer[lod].EndReadback();
                     }
                 }
                 
@@ -253,7 +258,8 @@ namespace Tuntenfisch.Voxels.DC
                     m_parent.m_voxelConfig.DualContouringConfig.Compute.SetVector(
                         ComputeShaderProperties.VoxelVolumeToWorldSpaceOffset,
                         (Vector3)task.VoxelVolumeToWorldSpaceOffset);
-                    m_parent.m_voxelConfig.DualContouringConfig.Compute.SetInt(ComputeShaderProperties.CellStride, 1);
+                    m_parent.m_voxelConfig.DualContouringConfig.Compute.SetInt(ComputeShaderProperties.CellStride,
+                        1);
 
                     // First we generate the inner cell vertices, i.e. all vertices which's cells do not reside on the surface of the voxel volume of this chunk.
                     m_parent.m_voxelConfig.DualContouringConfig.Compute.SetBuffer(0,
@@ -278,7 +284,8 @@ namespace Tuntenfisch.Voxels.DC
                     {
                         m_generatedVerticesBuffer1[lod].SetCounterValue(0);
 
-                        m_parent.m_voxelConfig.DualContouringConfig.Compute.SetInt(ComputeShaderProperties.CellStride,
+                        m_parent.m_voxelConfig.DualContouringConfig.Compute.SetInt(
+                            ComputeShaderProperties.CellStride,
                             cellStride);
                         // We need two buffers to merge the vertices. The first buffer acts as the source and the second as the destination.
                         m_parent.m_voxelConfig.DualContouringConfig.Compute.SetBuffer(1,
@@ -323,19 +330,24 @@ namespace Tuntenfisch.Voxels.DC
                     //우리가 너무 적은 꼭짓점과 삼각형을 검색했습니다. 실제 꼭짓점/삼각형 수를 사용하여 정확한 수로 다시 꼭짓점과 삼각형을 검색해야 합니다.
                     //따라서, 최선의 경우는 한 번의 리드백이고, 최악의 경우는 두 번의 리드백입니다. 즉, 최악의 경우가 이전의 최선의 경우만큼 나쁘고, 최선의 경우는 이전보다 두 배 좋습니다.
 
-                    (int estimatedVertexCount, int estimatedTriangleCount) = EstimateVertexAndTriangleCounts(task, lod, nextlod);
-                   // int estimatedVertexCount = 0;
+                    (int estimatedVertexCount, int estimatedTriangleCount) =
+                        EstimateVertexAndTriangleCounts(task, lod, nextlod);
+                    // int estimatedVertexCount = 0;
                     //int estimatedTriangleCount = 0;
-                    
+
                     // Copy the number of vertices/triangles generated into the start of the triangles buffer.
                     ComputeBuffer.CopyCount(m_generatedVerticesBuffer0[lod], m_generatedTrianglesBuffer[lod], 0);
                     ComputeBuffer.CopyCount(m_cellVertexInfoLookupTableBuffer[lod], m_generatedTrianglesBuffer[lod],
                         sizeof(uint));
-                    // Retrieve both the vertices and triangles buffer.
-                    m_generatedVerticesBuffer0[lod].StartReadbackNonAlloc(ref m_generatedVertices[lod], estimatedVertexCount);
-                    // We're adding 2 because the vertex and triangle counts are stored in the buffer as well.
+
+
+                            // Retrieve both the vertices and triangles buffer.
+                    m_generatedVerticesBuffer0[lod]
+                                .StartReadbackNonAlloc(ref m_generatedVertices[lod], estimatedVertexCount);
+                            // We're adding 2 because the vertex and triangle counts are stored in the buffer as well.
                     m_generatedTrianglesBuffer[lod].StartReadbackNonAlloc(ref m_generatedTriangles[lod],
-                        estimatedTriangleCount + 2);
+                                estimatedTriangleCount + 2);
+                    
                 }
             }
 

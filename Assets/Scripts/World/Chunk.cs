@@ -247,10 +247,19 @@ namespace Tuntenfisch.World
             m_mesh.SetSubMesh(0, new SubMeshDescriptor(0, triangleCount), flags);
             m_mesh.RecalculateBounds(flags);
 #else
-            m_mesh[m_currentLOD].SetVertexBufferData(vertices[m_currentLOD], vertexStartIndex, 0, vertexCount[m_currentLOD]);
-            m_mesh[m_currentLOD].SetIndexBufferData(triangles[m_currentLOD], triangleStartIndex, 0, triangleCount[m_currentLOD]);
-            m_mesh[m_currentLOD].SetSubMesh(0, new SubMeshDescriptor(0, triangleCount[m_currentLOD]));
-            m_mesh[m_currentLOD].RecalculateBounds(MeshUpdateFlags.DontValidateIndices);
+            try
+            {
+                m_mesh[m_currentLOD].SetVertexBufferData(vertices[m_currentLOD], vertexStartIndex, 0, vertexCount[m_currentLOD]);
+                m_mesh[m_currentLOD].SetIndexBufferData(triangles[m_currentLOD], triangleStartIndex, 0, triangleCount[m_currentLOD]);
+                m_mesh[m_currentLOD].SetSubMesh(0, new SubMeshDescriptor(0, triangleCount[m_currentLOD]));
+                m_mesh[m_currentLOD].RecalculateBounds(MeshUpdateFlags.DontValidateIndices);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
+            
 #endif
             
         }
