@@ -306,7 +306,8 @@ namespace Tuntenfisch.World
                 {
                     chunk.CreateVoxelVolumeBuffer();
                     chunk.RegenerateVoxelVolume();
-                    chunk.RegenerateMesh(lod);
+                    //chunk.RegenerateMesh(lod);
+                    chunk.OnLODChanged(lod);
                 }
                 else
                 {

@@ -117,6 +117,7 @@ namespace Tuntenfisch.Voxels.DC
         {
             Worker worker = m_availableWorkers.Pop();
 
+            
             worker.GenerateMeshAsync(task);
 
             do

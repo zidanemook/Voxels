@@ -209,7 +209,7 @@ namespace Tuntenfisch.World
             if (lod != -1 && lod != m_targetLOD)
             {
                 m_targetLOD = lod;
-                //m_flags |= ChunkFlags.MeshRegenerationRequested;
+                m_flags |= ChunkFlags.MeshRegenerationRequested;
             }
             else if (lod == -1)
             {
@@ -262,10 +262,13 @@ namespace Tuntenfisch.World
             
 #endif
             
+            OnLODChanged(m_targetLOD);
         }
 
-        private void OnLODChanged()
+        public void OnLODChanged(int targetLOD)
         {
+            m_currentLOD = targetLOD;
+            
             m_meshFilter.sharedMesh = null;
             m_meshFilter.sharedMesh = m_mesh[m_currentLOD];
 
