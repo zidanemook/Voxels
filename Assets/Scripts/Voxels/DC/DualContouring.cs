@@ -241,8 +241,13 @@ namespace Tuntenfisch.Voxels.DC
                             m_generatedTrianglesBuffer[lod].EndReadback();
                     }
                 }
-                
-               return Status.Done;
+
+                for (int lod = 0; lod < WorldManager.Instance.MaxLOD; ++lod)
+                {
+                    m_startedReadbackinProcess[lod] = false;
+                }
+
+                return Status.Done;
             }
 
             public void GenerateMeshAsync(Task task)
