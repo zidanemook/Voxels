@@ -255,13 +255,10 @@ namespace Tuntenfisch.Voxels.DC
                     m_cellVertexInfoLookupTableBuffer[lod].SetCounterValue(0);
                     m_generatedVerticesBuffer0[lod].SetCounterValue(0);
 
-                    m_parent.m_voxelConfig.DualContouringConfig.Compute.SetVector(
-                        ComputeShaderProperties.VoxelVolumeToWorldSpaceOffset,
-                        (Vector3)task.VoxelVolumeToWorldSpaceOffset);
-                    m_parent.m_voxelConfig.DualContouringConfig.Compute.SetInt(ComputeShaderProperties.CellStride,
-                        1);
+                    m_parent.m_voxelConfig.DualContouringConfig.Compute.SetVector(ComputeShaderProperties.VoxelVolumeToWorldSpaceOffset, (Vector3)task.VoxelVolumeToWorldSpaceOffset);
+                    m_parent.m_voxelConfig.DualContouringConfig.Compute.SetInt(ComputeShaderProperties.CellStride, 1);
 
-                    // First we generate the inner cell vertices, i.e. all vertices which's cells do not reside on the surface of the voxel volume of this chunk.
+                    // First we generate the inner cell vertices, i.e. all vertices which cells do not reside on the surface of the voxel volume of this chunk.
                     m_parent.m_voxelConfig.DualContouringConfig.Compute.SetBuffer(0,
                         ComputeShaderProperties.VoxelVolume,
                         task.VoxelVolumeBuffer);
