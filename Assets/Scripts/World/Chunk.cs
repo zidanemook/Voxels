@@ -209,7 +209,7 @@ namespace Tuntenfisch.World
             if (lod != -1 && lod != m_targetLOD)
             {
                 m_targetLOD = lod;
-                m_flags |= ChunkFlags.MeshRegenerationRequested;
+                //m_flags |= ChunkFlags.MeshRegenerationRequested;
             }
             else if (lod == -1)
             {
