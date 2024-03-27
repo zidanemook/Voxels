@@ -243,10 +243,10 @@ namespace Tuntenfisch.World
                 m_mesh[lod].SetIndexBufferParams(triangleCount[lod], IndexFormat.UInt32);
 #if !UNITY_EDITOR
                 MeshUpdateFlags flags = MeshUpdateFlags.DontNotifyMeshUsers | MeshUpdateFlags.DontRecalculateBounds | MeshUpdateFlags.DontResetBoneBounds | MeshUpdateFlags.DontValidateIndices;
-                m_mesh.SetVertexBufferData(vertices, vertexStartIndex, 0, vertexCount, 0, flags);
-                m_mesh.SetIndexBufferData(triangles, triangleStartIndex, 0, triangleCount, flags);
-                m_mesh.SetSubMesh(0, new SubMeshDescriptor(0, triangleCount), flags);
-                m_mesh.RecalculateBounds(flags);
+                m_mesh[lod].SetVertexBufferData(vertices[lod], vertexStartIndex, 0, vertexCount[lod], 0, flags);
+                m_mesh[lod].SetIndexBufferData(triangles[lod], triangleStartIndex, 0, triangleCount[lod], flags);
+                m_mesh[lod].SetSubMesh(0, new SubMeshDescriptor(0, triangleCount[lod]), flags);
+                m_mesh[lod].RecalculateBounds(flags);
 #else
                 try
                 {
