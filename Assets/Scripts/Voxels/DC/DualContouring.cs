@@ -197,12 +197,14 @@ namespace Tuntenfisch.Voxels.DC
             {
                 for (int lod = 0; lod < WorldManager.Instance.MaxLOD; ++lod)
                 {
+                    if (m_startedReadbackinProcess[lod])
+                    {
+                        continue;
+                    }
+                    
                     if (m_generatedVerticesBuffer0[lod].IsDataAvailable() && m_generatedTrianglesBuffer[lod].IsDataAvailable())
                     {
-                        if (true == m_startedReadbackinProcess[lod])
-                        {
-                            continue;
-                        }
+                        
                         int requestedVertexCount = m_generatedVerticesBuffer0[lod].EndReadback();
                         int requestedTriangleCount = m_generatedTrianglesBuffer[lod].EndReadback();
 
@@ -218,6 +220,10 @@ namespace Tuntenfisch.Voxels.DC
                             // If we retrieved too few vertices/triangles, we need to start another readback to retrieve the correct count.
                             m_generatedVerticesBuffer0[lod].StartReadbackNonAlloc(ref m_generatedVertices[lod], VertexCount[lod]);
                             m_generatedTrianglesBuffer[lod].StartReadbackNonAlloc(ref m_generatedTriangles[lod], TriangleCount[lod] + 2);
+                            return Status.WaitingForGPUReadback; 
+                        }
+                        else
+                        {
                             m_startedReadbackinProcess[lod] = true;
                         }
                     }
@@ -226,23 +232,7 @@ namespace Tuntenfisch.Voxels.DC
                         return Status.WaitingForGPUReadback;        
                     }
                 }
-
-                for (int lod = 0; lod < WorldManager.Instance.MaxLOD; ++lod)
-                {
-                    if (false == m_startedReadbackinProcess[lod] || false == m_generatedVerticesBuffer0[lod].IsDataAvailable() || false == m_generatedTrianglesBuffer[lod].IsDataAvailable())
-                    {
-                        return Status.WaitingForGPUReadback; 
-                    }
-                    else
-                    {
-                        if(m_generatedVerticesBuffer0[lod].ReadbackInProgress)
-                            m_generatedVerticesBuffer0[lod].EndReadback();
-                        
-                        if(m_generatedTrianglesBuffer[lod].ReadbackInProgress)
-                            m_generatedTrianglesBuffer[lod].EndReadback();
-                    }
-                }
-
+                
                 for (int lod = 0; lod < WorldManager.Instance.MaxLOD; ++lod)
                 {
                     m_startedReadbackinProcess[lod] = false;
