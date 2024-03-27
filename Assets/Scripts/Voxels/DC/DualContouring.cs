@@ -369,8 +369,6 @@ namespace Tuntenfisch.Voxels.DC
 
             private void CreateBuffers()
             {
-               
-                
                 // Create CPU buffers.
                 int maxNumberOfVertices = m_parent.m_voxelConfig.VoxelVolumeConfig.CellCount;
                 int generatedVerticesCapacity = maxNumberOfVertices;

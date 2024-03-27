@@ -42,6 +42,11 @@ namespace Tuntenfisch.World
         private List<GPUVoxelVolumeCSGOperation> m_voxelVolumeCSGOperations;
         private ChunkFlags m_flags;
 
+        public bool IsMeshGenerated()
+        {
+            return (m_flags & ChunkFlags.MeshGenerated) == ChunkFlags.MeshGenerated; 
+        }
+
         private void Awake()
         {
             m_vertexCount = new int[WorldManager.Instance.MaxLOD];
@@ -145,7 +150,7 @@ namespace Tuntenfisch.World
             m_request?.Cancel();
             m_request = null;
             m_voxelVolumeCSGOperations.Clear();
-            m_flags = 0;
+            m_flags = 0; 
             gameObject.SetActive(false);
         }
 
@@ -206,15 +211,8 @@ namespace Tuntenfisch.World
 
         public void RegenerateMesh(int lod = -1)
         {
-            if (lod != -1 && lod != m_targetLOD)
-            {
-                m_targetLOD = lod;
-                m_flags |= ChunkFlags.MeshRegenerationRequested;
-            }
-            else if (lod == -1)
-            {
-                m_flags |= ChunkFlags.MeshRegenerationRequested;
-            }
+            m_targetLOD = lod;
+            m_flags |= ChunkFlags.MeshRegenerationRequested;
         }
 
         public void ApplyCSGPrimitiveOperation(GPUCSGOperator csgOperator, GPUCSGPrimitive csgPrimitive, MaterialIndex materialIndex, Matrix4x4 worldToObjectMatrix)
@@ -230,43 +228,60 @@ namespace Tuntenfisch.World
             m_vertexCount = vertexCount;
             m_triangleCount = triangleCount;
 
-            if (vertexCount[m_currentLOD] == 0 || triangleCount[m_currentLOD] == 0)
+
+            for (int lod = 0; lod < WorldManager.Instance.MaxLOD; ++lod)
             {
-                m_meshFilter.sharedMesh = null;
-                m_meshCollider.sharedMesh = null;
+                if (vertexCount[lod] == 0 || triangleCount[lod] == 0)
+                {
+                    m_meshFilter.sharedMesh = null;
+                    m_meshCollider.sharedMesh = null;
 
-                return;
-            }
+                    continue;
+                }
 
-            m_mesh[m_currentLOD].SetVertexBufferParams(vertexCount[m_currentLOD], GPUVertex.Attributes);
-            m_mesh[m_currentLOD].SetIndexBufferParams(triangleCount[m_currentLOD], IndexFormat.UInt32);
+                m_mesh[lod].SetVertexBufferParams(vertexCount[lod], GPUVertex.Attributes);
+                m_mesh[lod].SetIndexBufferParams(triangleCount[lod], IndexFormat.UInt32);
 #if !UNITY_EDITOR
-            MeshUpdateFlags flags = MeshUpdateFlags.DontNotifyMeshUsers | MeshUpdateFlags.DontRecalculateBounds | MeshUpdateFlags.DontResetBoneBounds | MeshUpdateFlags.DontValidateIndices;
-            m_mesh.SetVertexBufferData(vertices, vertexStartIndex, 0, vertexCount, 0, flags);
-            m_mesh.SetIndexBufferData(triangles, triangleStartIndex, 0, triangleCount, flags);
-            m_mesh.SetSubMesh(0, new SubMeshDescriptor(0, triangleCount), flags);
-            m_mesh.RecalculateBounds(flags);
+                MeshUpdateFlags flags = MeshUpdateFlags.DontNotifyMeshUsers | MeshUpdateFlags.DontRecalculateBounds | MeshUpdateFlags.DontResetBoneBounds | MeshUpdateFlags.DontValidateIndices;
+                m_mesh.SetVertexBufferData(vertices, vertexStartIndex, 0, vertexCount, 0, flags);
+                m_mesh.SetIndexBufferData(triangles, triangleStartIndex, 0, triangleCount, flags);
+                m_mesh.SetSubMesh(0, new SubMeshDescriptor(0, triangleCount), flags);
+                m_mesh.RecalculateBounds(flags);
 #else
-            try
-            {
-                m_mesh[m_currentLOD].SetVertexBufferData(vertices[m_currentLOD], vertexStartIndex, 0, vertexCount[m_currentLOD]);
-                m_mesh[m_currentLOD].SetIndexBufferData(triangles[m_currentLOD], triangleStartIndex, 0, triangleCount[m_currentLOD]);
-                m_mesh[m_currentLOD].SetSubMesh(0, new SubMeshDescriptor(0, triangleCount[m_currentLOD]));
-                m_mesh[m_currentLOD].RecalculateBounds(MeshUpdateFlags.DontValidateIndices);
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                throw;
-            }
+                try
+                {
+                    m_mesh[lod].SetVertexBufferData(vertices[lod], vertexStartIndex, 0, vertexCount[lod]);
+                    m_mesh[lod].SetIndexBufferData(triangles[lod], triangleStartIndex, 0, triangleCount[lod]);
+                    m_mesh[lod].SetSubMesh(0, new SubMeshDescriptor(0, triangleCount[lod]));
+                    m_mesh[lod].RecalculateBounds(MeshUpdateFlags.DontValidateIndices);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                    throw;
+                }
             
 #endif
+            }
             
-            OnLODChanged(m_targetLOD);
+            
+            
+            m_meshFilter.sharedMesh = null;
+            m_meshFilter.sharedMesh = m_mesh[m_currentLOD];
+
+            m_bakeJobHandle = new BakeJob(m_mesh[m_currentLOD].GetInstanceID()).Schedule();
+            m_flags |= ChunkFlags.IsBakingMesh;
+            m_flags |= ChunkFlags.MeshGenerated;
+
+            if(m_targetLOD != 0)
+                ReleaseBuffers();
         }
 
         public void OnLODChanged(int targetLOD)
         {
+            if (m_currentLOD == targetLOD)
+                return;
+                
             m_currentLOD = targetLOD;
             
             m_meshFilter.sharedMesh = null;
@@ -303,7 +318,8 @@ namespace Tuntenfisch.World
             CSGOperationPerformed = 4,
             MeshRegenerationRequested = 8,
             IsBakingMesh = 16,
-            VoxelVolumeImportFromFileRequested = 32
+            VoxelVolumeImportFromFileRequested = 32,
+            MeshGenerated = 64,
         }
         
         public async UniTask ExportVolumeDataAsync(HashSet<int3> chunkFileList, string DirectoryPath)
